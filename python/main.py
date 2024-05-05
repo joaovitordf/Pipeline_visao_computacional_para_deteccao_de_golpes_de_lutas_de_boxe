@@ -12,9 +12,9 @@ from clusteriza import DominantColors
 from lutador import Lutador
 
 # Model available to download here: https://developers.google.com/mediapipe/solutions/vision/pose_landmarker#models
-model_path = utils.retorna_diretorio("pose_landmarker_heavy.task")
+model_path = utils.retorna_diretorio("/pesos/pose_landmarker_heavy.task")
 
-video_source = utils.retorna_diretorio("videocompletocorte.mp4")
+video_source = utils.retorna_diretorio("/videos/videocompletocorte.mp4")
 
 num_poses = 2
 min_pose_detection_confidence = 0.7
