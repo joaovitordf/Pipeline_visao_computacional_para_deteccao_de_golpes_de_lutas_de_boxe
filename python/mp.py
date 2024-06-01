@@ -238,12 +238,9 @@ def print_result(detection_result: vision.PoseLandmarkerResult, output_image: mp
     #cv2.waitKey(0)
 
 
-base_options = python.BaseOptions(model_asset_path=model_path)
+"""base_options = python.BaseOptions(model_asset_path=model_path)"""
 
-
-"""
 base_options = python.BaseOptions(model_asset_path=model_path, delegate=python.BaseOptions.Delegate.GPU)
-"""
 
 options = vision.PoseLandmarkerOptions(
     base_options=base_options,
@@ -278,7 +275,7 @@ with vision.PoseLandmarker.create_from_options(options) as landmarker:
 
         if to_window is not None:
             cv2.imshow("MediaPipe Pose Landmark", to_window)
-            time.sleep(0.4)
+            time.sleep(0.05)
             
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -151,6 +151,7 @@ def pernaCoordenadas(imagem, keypoints):
     return recorte
 
 def clusterizaFunction(imagem, results):
+    cores = []
     if hasattr(results[0], 'keypoints'):
         # Access the keypoints for the first detected object
         keypoints = results[0].keypoints
@@ -161,10 +162,15 @@ def clusterizaFunction(imagem, results):
             #draw_boundingBox(imagem, keypoints_numpy)
             imagens_pessoa.append(pernaCoordenadas(imagem, keypoints_numpy))
 
-        cores = list()
         for pessoa in imagens_pessoa:
-            teste = DominantColors(pessoa, 1)
-            cor = teste.dominantColors()
-            cores.append(cor[0])
+            if pessoa.size == 0:
+                print("Recorte vazio, pulando processamento.")
+                continue
+            try:
+                teste = DominantColors(pessoa, 1)
+                cor = teste.dominantColors()
+                cores.append(cor[0])
+            except ValueError as e:
+                print(f"Erro ao processar a imagem: {e}")
 
         return cores

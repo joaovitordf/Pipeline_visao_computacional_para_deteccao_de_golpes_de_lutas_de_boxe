@@ -13,7 +13,7 @@ from lutador import Lutador
 def main():
     model_path = utils.retorna_diretorio("/pesos/yolov8m-pose.pt")
 
-    video_source = utils.retorna_diretorio("/videos/videocompletocorte.mp4")
+    video_source = utils.retorna_diretorio("/videos/videoteste.mp4")
 
     imagem_source = utils.retorna_diretorio("/videos/imagemBoxe.png")
 
@@ -29,19 +29,22 @@ def main():
 
         if success:
             results = model(frame, verbose = False)
-            cores = clusterizaFunction(frame, results)
-            annotator = boundingBox(frame, results, cores, lutador1, lutador2)
-            annotated_frame = annotator.result()
+            try:
+                cores = clusterizaFunction(frame, results)
+                annotator = boundingBox(frame, results, cores, lutador1, lutador2)
+                annotated_frame = annotator.result()
+                altura, largura, _ = np.shape(annotated_frame)
+                frame = cv2.resize(annotated_frame, (int((largura*0.6)),int((altura*0.6))))
+                cv2.imshow("teste", frame)
+            except Exception as e:
+                print(f"Erro ao processar o frame: {e}")
+
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
         else:
             break
-        
-        altura, largura, _ = np.shape(annotated_frame)
-        frame = cv2.resize(annotated_frame, (int((largura*0.6)),int((altura*0.6))))
-        cv2.imshow("teste", frame)
-        time.sleep(0.2)
 
+        time.sleep(0.2)
 
     cap.release()
     cv2.destroyAllWindows()

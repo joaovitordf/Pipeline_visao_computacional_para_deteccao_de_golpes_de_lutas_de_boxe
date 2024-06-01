@@ -4,6 +4,7 @@ from ultralytics import YOLO
 from ultralytics.utils.plotting import Annotator
 import numpy as np
 from yolo.clusteriza import DominantColors, clusterizaFunction
+from yolo.identificaColisao import colisao
 
 def troncoCoordenadas(imagem, keypoints):
 
@@ -95,6 +96,7 @@ def boundingBox(frame, results, cores, lutador1, lutador2):
         boxes = r.boxes
 
         contador = 0
+        armazenaAreaLutadorDetectado = list()
 
         for box in boxes:
             
@@ -106,11 +108,28 @@ def boundingBox(frame, results, cores, lutador1, lutador2):
             cor = teste.dominantColors()
 
             identifica_lutador = define_lutador(lutador1, lutador2, cor[0])
-
-            b = box.xyxy[0] 
+            
+            b = box.xyxy[0]
 
             label_lutador = "Lutador " + str(identifica_lutador)
-            annotator.box_label(b, label_lutador)
+            annotator.box_label(b, label_lutador, color=(0,0,255))
+
+            box = b.tolist()
+
+            armazenaAreaLutadorDetectado.append(box)
+
+            if contador == 1:
+                #xyxy
+                retangulo1 = armazenaAreaLutadorDetectado[0]
+
+                retangulo2 = armazenaAreaLutadorDetectado[1]
+
+                if colisao(retangulo1, retangulo2):
+                    print("Colisao.")
+                else:
+                    pass
+                    #print("Sem colisao.")
+
             contador += 1
     
     return annotator
