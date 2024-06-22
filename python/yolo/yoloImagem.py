@@ -4,6 +4,7 @@ from ultralytics.utils.plotting import Annotator
 import os
 from sklearn.cluster import KMeans
 import numpy as np
+import math
 
 class DominantColors:
 
@@ -168,3 +169,91 @@ def yoloImagem(model, caminho_imagem):
     else:
         print("No keypoints attribute found in the results.")
         """
+    
+def yoloAnguloJuntas(model, caminho_imagem):
+    imagem = cv2.imread(caminho_imagem)
+    results = model(imagem, verbose = False)
+    if hasattr(results[0], 'keypoints'):
+        # Access the keypoints for the first detected object
+        keypoints = results[0].keypoints
+        # Convert keypoints to numpy array and access the keypoints for the first detected object
+        imagens_pessoa = list()
+        for pessoa in keypoints:
+            keypoints_numpy = pessoa.xyn.cpu().numpy()[0]
+
+            x_6 = keypoints_numpy[6][0]
+            y_6 = keypoints_numpy[6][1]
+
+            # Quero o angulo de 8
+            x_8 = keypoints_numpy[8][0]
+            y_8 = keypoints_numpy[8][1]
+
+            x_10 = keypoints_numpy[10][0]
+            y_10 = keypoints_numpy[10][1]
+
+            pontos = np.array([[x_6, y_6],[x_8, y_8],[x_10, y_10]])
+            A = (pontos[0][0], pontos[0][1])
+            B = (pontos[1][0], pontos[1][1])
+            C = (pontos[2][0], pontos[2][1])
+
+            print(A,B,C)
+
+            printAngle(A,B,C)
+            
+
+            annotated_frame = results[0].plot(boxes = False)
+
+            """annotated_frame = desenhaCirculo(annotated_frame, results, x_6, y_6)
+            annotated_frame = desenhaCirculo(annotated_frame, results, x_8, y_8)
+            annotated_frame = desenhaCirculo(annotated_frame, results, x_10, y_10)"""
+
+            cv2.imshow("imagem", annotated_frame)
+            cv2.waitKey(0)
+
+def desenhaCirculo(annotated_frame, results, x,y):
+    centro = (x, y)
+    raio = 5  # Raio do círculo
+    cor = (0, 0, 255)  # Cor do círculo em BGR 
+    espessura = 10
+    #print(results)
+    #print(keypoints_numpy)
+
+    cv2.circle(annotated_frame, centro, raio, cor, espessura)
+
+    return annotated_frame
+
+def printAngle(A, B, C):  
+      
+    # Square of lengths be a2, b2, c2  
+    a2 = lengthSquare(B, C)  
+    b2 = lengthSquare(A, C)  
+    c2 = lengthSquare(A, B)  
+  
+    # length of sides be a, b, c  
+    a = math.sqrt(a2);  
+    b = math.sqrt(b2);  
+    c = math.sqrt(c2);  
+  
+    # From Cosine law  
+    alpha = math.acos((b2 + c2 - a2) /
+                         (2 * b * c));  
+    betta = math.acos((a2 + c2 - b2) / 
+                         (2 * a * c));  
+    gamma = math.acos((a2 + b2 - c2) / 
+                         (2 * a * b));  
+  
+    # Converting to degree  
+    alpha = alpha * 180 / math.pi;  
+    betta = betta * 180 / math.pi;  
+    gamma = gamma * 180 / math.pi;  
+  
+    # printing all the angles  
+    print("alpha : %f" %(alpha))  
+    print("betta : %f" %(betta)) 
+    print("gamma : %f" %(gamma)) 
+
+# returns square of distance b/w two points  
+def lengthSquare(X, Y):  
+    xDiff = X[0] - Y[0]  
+    yDiff = X[1] - Y[1]  
+    return xDiff * xDiff + yDiff * yDiff 

@@ -3,39 +3,39 @@ from sklearn.cluster import KMeans
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # FONTE: https://medium.com/buzzrobot/dominant-colors-in-an-image-using-k-means-clustering-3c7af4622036
 
 class DominantColors:
-
     CLUSTERS = None
     IMAGE = None
     COLORS = None
     LABELS = None
-    
+
     def __init__(self, image, clusters=3):
         self.CLUSTERS = clusters
         self.IMAGE = image
-        
+
     def dominantColors(self):
         #read image
         img = self.IMAGE
-                
+
         #reshaping to a list of pixels
         img = img.reshape((img.shape[0] * img.shape[1], 3))
-        
+
         #save image after operations
         self.IMAGE = img
-        
+
         #using k-means to cluster pixels
-        kmeans = KMeans(n_clusters = self.CLUSTERS)
+        kmeans = KMeans(n_clusters=self.CLUSTERS)
         kmeans.fit(img)
-        
+
         #the cluster centers are our dominant colors.
         self.COLORS = kmeans.cluster_centers_
-        
+
         #save labels
         self.LABELS = kmeans.labels_
-        
+
         """# Criar uma imagem em branco para exibir as cores
         color_display = np.zeros((100, len(self.COLORS) * 100, 3), dtype=np.uint8)
 
@@ -47,7 +47,7 @@ class DominantColors:
         cv2.waitKey(0)"""
         #returning after converting to integer from float
         return self.COLORS.astype(int)
-    
+
     """def plotHistogram(self):
        
         #labels form 0 to no. of clusters
@@ -88,15 +88,15 @@ class DominantColors:
         plt.imshow(chart)
         plt.show()"""
 
+
 def troncoCoordenadas(imagem, keypoints):
+    x1 = int(keypoints[6][0] * imagem.shape[1])
 
-    x1 = int(keypoints[6][0]*imagem.shape[1])
+    y1 = int(keypoints[6][1] * imagem.shape[0])
 
-    y1 = int(keypoints[6][1]*imagem.shape[0])
+    x2 = int(keypoints[11][0] * imagem.shape[1])
 
-    x2 = int(keypoints[11][0]*imagem.shape[1])
-
-    y2 = int(keypoints[11][1]*imagem.shape[0])
+    y2 = int(keypoints[11][1] * imagem.shape[0])
 
     if x1 > x2:
         coordenada_start_x = x2
@@ -118,16 +118,16 @@ def troncoCoordenadas(imagem, keypoints):
     recorte = imagem[coordenada_start_y: coordenada_end_y, coordenada_start_x:coordenada_end_x]
 
     return recorte
+
 
 def pernaCoordenadas(imagem, keypoints):
+    x1 = int(keypoints[12][0] * imagem.shape[1])
 
-    x1 = int(keypoints[12][0]*imagem.shape[1])
+    y1 = int(keypoints[12][1] * imagem.shape[0])
 
-    y1 = int(keypoints[12][1]*imagem.shape[0])
+    x2 = int(keypoints[13][0] * imagem.shape[1])
 
-    x2 = int(keypoints[13][0]*imagem.shape[1])
-
-    y2 = int(keypoints[13][1]*imagem.shape[0])
+    y2 = int(keypoints[13][1] * imagem.shape[0])
 
     if x1 > x2:
         coordenada_start_x = x2
@@ -149,6 +149,7 @@ def pernaCoordenadas(imagem, keypoints):
     recorte = imagem[coordenada_start_y: coordenada_end_y, coordenada_start_x:coordenada_end_x]
 
     return recorte
+
 
 def clusterizaFunction(imagem, results):
     cores = []
