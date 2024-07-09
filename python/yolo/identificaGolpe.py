@@ -137,3 +137,28 @@ def lengthSquare(X, Y):
     xDiff = X[0] - Y[0]
     yDiff = X[1] - Y[1]
     return xDiff * xDiff + yDiff * yDiff
+
+
+"""import numpy as np
+
+def calculate_angle(p1, p2, p3):
+    # p1, p2, p3 are the points in format [x, y]
+    # Calculate the vectors
+    v1 = np.array(p1) - np.array(p2)
+    v2 = np.array(p3) - np.array(p2)
+    
+    # Calculate the angle in radians
+    angle_rad = np.arccos(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
+    
+    # Convert to degrees
+    angle_deg = np.degrees(angle_rad)
+    
+    return angle_deg
+
+# Example points
+p1 = [0, 0]
+p2 = [1, 0]
+p3 = [1, 1]
+
+angle = calculate_angle(p1, p2, p3)
+print(f"The angle is {angle} degrees")"""

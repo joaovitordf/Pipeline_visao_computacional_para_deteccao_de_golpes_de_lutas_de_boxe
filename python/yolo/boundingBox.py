@@ -7,34 +7,9 @@ from yolo.clusteriza import DominantColors, clusterizaFunction
 from yolo.identificaColisao import colisao
 from yolo.identificaGolpe import golpe
 
+from yolo.roiParts import linhaCintura, maoEsquerda, maoDireita, troncoCoordenadas
 
-def troncoCoordenadas(imagem, keypoints):
-    x1 = int(keypoints[6][0] * imagem.shape[1])
-
-    y1 = int(keypoints[6][1] * imagem.shape[0])
-
-    x2 = int(keypoints[11][0] * imagem.shape[1])
-
-    y2 = int(keypoints[11][1] * imagem.shape[0])
-
-    if x1 > x2:
-        coordenada_start_x = x2
-        coordenada_end_x = x1
-    else:
-        coordenada_start_x = x1
-        coordenada_end_x = x2
-
-    if y1 > y2:
-        coordenada_start_y = y2
-        coordenada_end_y = y1
-    else:
-        coordenada_start_y = y1
-        coordenada_end_y = y2
-
-    #print(coordenada_start_y, coordenada_end_y)
-    #print(coordenada_start_x, coordenada_end_x)
-
-    return [coordenada_start_x, coordenada_end_x, coordenada_start_y, coordenada_end_y]
+from python.yolo.roiParts import cabecaCoordenadas
 
 
 def pernaCoordenadas(imagem, keypoints):
@@ -99,10 +74,29 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
         identifica_lutador = define_lutador(lutador1, lutador2, cor[0])
         if identifica_lutador == 1:
             lutador1.identificador = 1
-            lutador1.coordenadas = keypoints_numpy
+            cabeca = cabecaCoordenadas(frame, keypoints_numpy)
+            tronco = troncoCoordenadas(frame, keypoints_numpy)
+            linhasCinturas = linhaCintura(frame, keypoints_numpy)
+            maoEsquerdaCoord = maoEsquerda(frame, keypoints_numpy)
+            maoDireitaCoord = maoDireita(frame, keypoints_numpy)
+            lutador1.cabeca = cabeca
+            lutador1.tronco = tronco
+            lutador1.linhasCinturas = linhasCinturas
+            lutador1.maoEsquerdaCoord = maoEsquerdaCoord
+            lutador1.maoDireitaCoord = maoDireitaCoord
             frame_lutador[frame_count].update({'lutador_1': lutador1})
         elif identifica_lutador == 2:
             lutador2.identificador = 2
+            cabeca = cabecaCoordenadas(frame, keypoints_numpy)
+            tronco = troncoCoordenadas(frame, keypoints_numpy)
+            linhasCinturas = linhaCintura(frame, keypoints_numpy)
+            maoEsquerdaCoord = maoEsquerda(frame, keypoints_numpy)
+            maoDireitaCoord = maoDireita(frame, keypoints_numpy)
+            lutador2.cabeca = cabeca
+            lutador2.tronco = tronco
+            lutador2.linhasCinturas = linhasCinturas
+            lutador2.maoEsquerdaCoord = maoEsquerdaCoord
+            lutador2.maoDireitaCoord = maoDireitaCoord
             lutador2.coordenadas = keypoints_numpy
             frame_lutador[frame_count].update({'lutador_2': lutador2})
 
@@ -123,7 +117,6 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
             cor = teste.dominantColors()
 
             identifica_lutador = define_lutador(lutador1, lutador2, cor[0])
-
             if identifica_lutador == 1:
                 lutador1.identificador = 1
                 lutador1.box = box
@@ -140,11 +133,64 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
             areaLutador.append(box)
 
             label_lutador = "Lutador " + str(identifica_lutador)
-            annotator.box_label(b, label_lutador, color=(0, 0, 255))
+            annotator.box_label(b, label_lutador, color=(0, 255, 0))
+
+            if lutador1.cabeca is not None:
+                start, end = lutador1.cabeca
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+            if lutador1.tronco is not None:
+                start, end = lutador1.tronco
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+            if lutador1.linhasCinturas is not None:
+                start, end = lutador1.linhasCinturas
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+            if lutador1.maoEsquerdaCoord is not None:
+                start, end = lutador1.maoEsquerdaCoord
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+            if lutador1.maoDireitaCoord is not None:
+                start, end = lutador1.maoDireitaCoord
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+
+            if lutador2.cabeca is not None:
+                start, end = lutador2.cabeca
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+            if lutador2.tronco is not None:
+                start, end = lutador2.tronco
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+            if lutador2.linhasCinturas is not None:
+                start, end = lutador2.linhasCinturas
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+            if lutador2.maoEsquerdaCoord is not None:
+                start, end = lutador2.maoEsquerdaCoord
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+            if lutador2.maoDireitaCoord is not None:
+                start, end = lutador2.maoDireitaCoord
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+
             contador += 1
 
         #verifica_colisao(keypoints, r, frame, areaLutador, coordenada_corte, lutador1, lutador2)
+        """cab = cabeca(frame, results)
+        for c in cab:
+            (start, end) = c
+            annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+        tronco = troncoCoordenadas(frame, results)
+        for tron in tronco:
+            (start, end) = tron
+            annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
 
+        linhasCinturas = linhaCintura(frame, results)
+        for linha in linhasCinturas:
+            (start, end) = linha
+            annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 10)
+        maoEsquerdaCoord = maoEsquerda(frame, results)
+        for maoEsq in maoEsquerdaCoord:
+            (start, end) = maoEsq
+            annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
+        maoDireitaCoord = maoDireita(frame, results)
+        for maoDir in maoDireitaCoord:
+            (start, end) = maoDir
+            annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)"""
         return annotator
 
 

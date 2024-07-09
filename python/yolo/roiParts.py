@@ -1,0 +1,111 @@
+import numpy as np
+import cv2
+
+
+def cabecaCoordenadas(imagem, keypoints_numpy):
+    # nose: 0
+    x = int(keypoints_numpy[0][0] * imagem.shape[1])
+
+    y = int(keypoints_numpy[0][1] * imagem.shape[0])
+
+    if x != 0 and y != 0:
+
+        start_point = (x-60, y-30)
+        end_point = (x+60, y+30)
+
+        cabecaCoord = (start_point, end_point)
+        return cabecaCoord
+    else:
+        return None
+
+
+def maoEsquerda(imagem, keypoints_numpy):
+    # left-writs: 9
+    x = int(keypoints_numpy[9][0] * imagem.shape[1])
+
+    y = int(keypoints_numpy[9][1] * imagem.shape[0])
+
+    if x != 0 and y != 0:
+
+        start_point = (x-60, y-30)
+        end_point = (x+60, y+30)
+
+        maoCoord = (start_point, end_point)
+
+        return maoCoord
+    else:
+        return None
+
+
+def maoDireita(imagem, keypoints_numpy):
+    # right-writs: 10
+    x = int(keypoints_numpy[10][0] * imagem.shape[1])
+
+    y = int(keypoints_numpy[10][1] * imagem.shape[0])
+
+    if x != 0 and y != 0:
+        start_point = (x - 60, y - 30)
+        end_point = (x + 60, y + 30)
+
+        maoCoord = (start_point, end_point)
+
+        return maoCoord
+    else:
+        return None
+
+def linhaCintura(imagem, keypoints_numpy):
+    # left-hip: 11
+    # right-hip: 12
+    x1 = int(keypoints_numpy[11][0] * imagem.shape[1])
+
+    y1 = int(keypoints_numpy[11][1] * imagem.shape[0])
+
+    x2 = int(keypoints_numpy[12][0] * imagem.shape[1])
+
+    y2 = int(keypoints_numpy[12][1] * imagem.shape[0])
+
+    if (x1, y1) != (0, 0) and (x2, y2) != (0, 0):
+        # Modifiquei o X pois em alguns frames a linha fica muito pequena
+        aux_min_x = min(x1, x2)
+
+        aux_min_x -= 80
+
+        aux_max_x = max(x1, x2)
+
+        aux_max_x += 80
+
+        start_point = (aux_min_x, min(y1, y2))
+        end_point = (aux_max_x, max(y1, y2))
+
+
+
+        linhaCinturaCoord = (start_point, end_point)
+
+        return linhaCinturaCoord
+    else:
+        return None
+
+def troncoCoordenadas(imagem, keypoints_numpy):
+    # right-shoulder: 6
+    # left-hip: 11
+    x1 = int(keypoints_numpy[6][0] * imagem.shape[1])
+
+    y1 = int(keypoints_numpy[6][1] * imagem.shape[0])
+
+    x2 = int(keypoints_numpy[11][0] * imagem.shape[1])
+
+    y2 = int(keypoints_numpy[11][1] * imagem.shape[0])
+
+    if (x1, y1) != (0, 0) and (x2, y2) != (0, 0):
+        aux_min_x = min(x1, x2)
+
+        aux_max_x = max(x1, x2)
+
+        start_point = (aux_min_x, min(y1, y2))
+        end_point = (aux_max_x, max(y1, y2))
+
+        troncoCoord = (start_point, end_point)
+
+        return troncoCoord
+    else:
+        return None

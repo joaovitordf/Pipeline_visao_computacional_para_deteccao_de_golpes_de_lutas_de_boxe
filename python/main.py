@@ -1,4 +1,5 @@
 import utils
+from yolo.identificaColisao import automatoColisao
 
 from yolo.boundingBox import boundingBox
 from yolo.clusteriza import clusterizaFunction
@@ -14,7 +15,7 @@ from lutador import Lutador
 def main():
     model_path = utils.retorna_diretorio("/pesos/yolov8m-pose.pt")
 
-    video_source = utils.retorna_diretorio("/videos/videocompletocorte.mp4")
+    video_source = utils.retorna_diretorio("/videos/videocompletocorte2.mp4")
 
     imagem_source = utils.retorna_diretorio("/videos/imagemBoxe.png")
 
@@ -37,6 +38,7 @@ def main():
                 #lutador1.socos += 1
                 cores = clusterizaFunction(frame, results)
                 annotator = boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
+                colisao = automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
                 annotated_frame = annotator.result()
                 altura, largura, _ = np.shape(annotated_frame)
                 frame = cv2.resize(annotated_frame, (int((largura * 0.6)), int((altura * 0.6))))

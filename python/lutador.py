@@ -1,20 +1,29 @@
 class Lutador:
-    def __init__(self, identificador, cor, socos=0, coordenadas=None, box=None):
-        # A variável 'identificador' diferencia entre os lutadores.
+    def __init__(self, identificador, cor, socos=0, coordenadas=None, box=None, cabeca=None, tronco=None, linhasCinturas=None, maoEsquerdaCoord=None, maoDireitaCoord=None):
+        # 'identificador' diferencia os lutadores.
         self.identificador = identificador
         self.cor = cor
 
         self.primeira_execucao = 0
 
-        # A variável 'socos' guarda o número de socos de cada lutador.
+        # 'socos' guarda o número de socos de cada lutador.
         self.socos = socos
 
         self.coordenadas = coordenadas
 
         self.box = box
 
-    def dar_soco(self):
+        self.cabeca = cabeca
+        self.tronco = tronco
+        self.linhasCinturas = linhasCinturas
+        self.maoEsquerdaCoord = maoEsquerdaCoord
+        self.maoDireitaCoord = maoDireitaCoord
+
+        self.punchInRegion = False
+
+    def soco(self):
         self.socos += 1
+        print("Lutador: ", self.identificador, "Socos: ", self.socos)
 
     def __str__(self):
         return f"Lutador {self.identificador}: {self.socos} socos, {self.coordenadas}, {self.box}"
