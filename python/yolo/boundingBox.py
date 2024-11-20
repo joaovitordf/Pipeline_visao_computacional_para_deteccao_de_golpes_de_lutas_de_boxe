@@ -146,7 +146,7 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
             if lutador1.maoEsquerdaCoord is not None:
                 start, end = lutador1.maoEsquerdaCoord
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
             if lutador1.maoDireitaCoord is not None:
                 start, end = lutador1.maoDireitaCoord
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
@@ -162,7 +162,7 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
             if lutador2.maoEsquerdaCoord is not None:
                 start, end = lutador2.maoEsquerdaCoord
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
             if lutador2.maoDireitaCoord is not None:
                 start, end = lutador2.maoDireitaCoord
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)

@@ -10,8 +10,8 @@ def cabecaCoordenadas(imagem, keypoints_numpy):
 
     if x != 0 and y != 0:
 
-        start_point = (x-60, y-30)
-        end_point = (x+60, y+30)
+        start_point = (x-30, y-30)
+        end_point = (x+30, y+30)
 
         cabecaCoord = (start_point, end_point)
         return cabecaCoord
@@ -27,8 +27,8 @@ def maoEsquerda(imagem, keypoints_numpy):
 
     if x != 0 and y != 0:
 
-        start_point = (x-60, y-30)
-        end_point = (x+60, y+30)
+        start_point = (x-50, y-30)
+        end_point = (x+50, y+30)
 
         maoCoord = (start_point, end_point)
 
@@ -44,8 +44,8 @@ def maoDireita(imagem, keypoints_numpy):
     y = int(keypoints_numpy[10][1] * imagem.shape[0])
 
     if x != 0 and y != 0:
-        start_point = (x - 60, y - 30)
-        end_point = (x + 60, y + 30)
+        start_point = (x - 50, y - 30)
+        end_point = (x + 50, y + 30)
 
         maoCoord = (start_point, end_point)
 
@@ -100,6 +100,10 @@ def troncoCoordenadas(imagem, keypoints_numpy):
         aux_min_x = min(x1, x2)
 
         aux_max_x = max(x1, x2)
+
+        # Preciso ter um tamanho minimo
+        if aux_max_x - aux_min_x <= 40:
+            aux_max_x += 30
 
         start_point = (aux_min_x, min(y1, y2))
         end_point = (aux_max_x, max(y1, y2))
