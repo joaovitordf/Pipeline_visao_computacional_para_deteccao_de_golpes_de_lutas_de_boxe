@@ -19,7 +19,8 @@ class Lutador:
         self.maoEsquerdaCoord = maoEsquerdaCoord
         self.maoDireitaCoord = maoDireitaCoord
 
-        self.punchInRegion = False
+        self.maoDireitaCabeca = False
+        self.maoEsquerdaCabeca = False
 
     def soco(self):
         self.socos += 1
