@@ -45,16 +45,11 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
             lut1.soco()
 
     r1 = None
-    r2 = None
 
     # Golpe de mao direita do lutador 1 no lutador 2
     if lut1.maoDireitaCoord is not None:
         (x1, y1), (x2, y2) = lut1.maoDireitaCoord
         r1 = x1, y1, x2, y2
-
-    if lut2.cabeca is not None:
-        (x1, y1), (x2, y2) = lut2.cabeca
-        r2 = x1, y1, x2, y2
 
     if r1 is not None and r2 is not None:
         if colisao(r1, r2):
@@ -83,6 +78,26 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
         if not colisao(r1, r2) and lut2.maoEsquerdaCabeca:
             lut2.maoEsquerdaCabeca = False
             lut2.soco()
+
+    r1 = None
+
+    if lut2.maoDireitaCoord is not None:
+        (x1, y1), (x2, y2) = lut2.maoDireitaCoord
+        r1 = x1, y1, x2, y2
+
+    if lut1.cabeca is not None:
+        (x1, y1), (x2, y2) = lut1.cabeca
+        r2 = x1, y1, x2, y2
+
+    if r1 is not None and r2 is not None:
+        if colisao(r1, r2):
+            lut2.maoDireitaCabeca = True
+        if not colisao(r1, r2) and lut2.maoDireitaCabeca:
+            lut2.maoDireitaCabeca = False
+            lut2.soco()
+
+    r1 = None
+    r2 = None
 
     # ----------------------------------------------------------------------------------------
 

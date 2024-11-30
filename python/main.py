@@ -1,3 +1,5 @@
+from torch.xpu import device
+
 import utils
 from yolo.identificaColisao import automatoColisao
 
@@ -13,11 +15,11 @@ from lutador import Lutador
 
 
 def main():
-    model_path = utils.retorna_diretorio("/pesos/yolov8m-pose.pt")
+    model_path = utils.retorna_diretorio("pesos/yolov8m-pose.pt")
 
-    video_source = utils.retorna_diretorio("/videos/videocompletocorte2.mp4")
+    video_source = utils.retorna_diretorio("videos/videoteste.mp4")
 
-    imagem_source = utils.retorna_diretorio("/videos/imagemBoxe.png")
+    imagem_source = utils.retorna_diretorio("videos/imagemBoxe.png")
 
     model = YOLO(model_path)
 
@@ -32,7 +34,7 @@ def main():
     while cap.isOpened():
         success, frame = cap.read()
         if success:
-            results = model(frame, verbose=False)
+            results = model(frame, verbose=False, device="cuda")
             try:
                 frame_lutador[frame_count] = {'frame': frame_count, 'lutador_1': lutador1, 'lutador_2': lutador2}
                 #lutador1.socos += 1
@@ -53,7 +55,7 @@ def main():
         #print(frame_lutador[frame_count]['lutador_1'])
         #print(frame_lutador[frame_count]['lutador_2'])
         frame_count += 1
-        time.sleep(0.2)
+        #time.sleep(0.1)
 
     cap.release()
     cv2.destroyAllWindows()
