@@ -1,5 +1,6 @@
 import cv2
-from yolo.roiParts import cabecaCoordenadas, troncoCoordenadas, maoEsquerda, maoDireita
+
+from python.yolo.moduloMeioLutador import moduloMeioLutadores
 
 
 def colisao(r1, r2):
@@ -19,9 +20,12 @@ def colisao(r1, r2):
 
 
 def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count):
+
     # Atravessou roi da cabeca ou corpo
-    lut1 = frame_lutador[frame_count]["lutador_1"]
-    lut2 = frame_lutador[frame_count]["lutador_2"]
+
+    # Recebe as coordenadas se forem validas continua na funcao
+    moduloMeioLutadores(frame_count, lutador1, lutador2)
+
     keypoints = results[0].keypoints
 
     # ----------------------------- Possivel ataque do lutador 1 -----------------------------
@@ -29,34 +33,34 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
     r2 = None
 
     # Golpe de mao esquerda do lutador 1 no lutador 2
-    if lut1.maoEsquerdaCoord is not None:
-        (x1, y1), (x2, y2) = lut1.maoEsquerdaCoord
+    if lutador1.roi_mao_esquerda is not None:
+        (x1, y1), (x2, y2) = lutador1.roi_mao_esquerda
         r1 = x1, y1, x2, y2
 
-    if lut2.cabeca is not None:
-        (x1, y1), (x2, y2) = lut2.cabeca
+    if lutador2.roi_cabeca is not None:
+        (x1, y1), (x2, y2) = lutador2.roi_cabeca
         r2 = x1, y1, x2, y2
 
     if r1 is not None and r2 is not None:
         if colisao(r1, r2):
-            lut1.maoEsquerdaCabeca = True
-        if not colisao(r1, r2) and lut1.maoEsquerdaCabeca:
-            lut1.maoEsquerdaCabeca = False
-            lut1.soco()
+            lutador1.maoEsquerdaCabeca = True
+        if not colisao(r1, r2) and lutador1.maoEsquerdaCabeca:
+            lutador1.maoEsquerdaCabeca = False
+            lutador1.soco()
 
     r1 = None
 
     # Golpe de mao direita do lutador 1 no lutador 2
-    if lut1.maoDireitaCoord is not None:
-        (x1, y1), (x2, y2) = lut1.maoDireitaCoord
+    if lutador1.roi_mao_direita is not None:
+        (x1, y1), (x2, y2) = lutador1.roi_mao_direita
         r1 = x1, y1, x2, y2
 
     if r1 is not None and r2 is not None:
         if colisao(r1, r2):
-            lut1.maoDireitaCabeca = True
-        if not colisao(r1, r2) and lut1.maoDireitaCabeca:
-            lut1.maoDireitaCabeca = False
-            lut1.soco()
+            lutador1.maoDireitaCabeca = True
+        if not colisao(r1, r2) and lutador1.maoDireitaCabeca:
+            lutador1.maoDireitaCabeca = False
+            lutador1.soco()
 
     # ----------------------------------------------------------------------------------------
 
@@ -64,42 +68,42 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
     r1 = None
     r2 = None
 
-    if lut2.maoEsquerdaCoord is not None:
-        (x1, y1), (x2, y2) = lut2.maoEsquerdaCoord
+    if lutador2.roi_mao_esquerda is not None:
+        (x1, y1), (x2, y2) = lutador2.roi_mao_esquerda
         r1 = x1, y1, x2, y2
 
-    if lut1.cabeca is not None:
-        (x1, y1), (x2, y2) = lut1.cabeca
+    if lutador1.roi_cabeca is not None:
+        (x1, y1), (x2, y2) = lutador1.roi_cabeca
         r2 = x1, y1, x2, y2
 
     if r1 is not None and r2 is not None:
         if colisao(r1, r2):
-            lut2.maoEsquerdaCabeca = True
-        if not colisao(r1, r2) and lut2.maoEsquerdaCabeca:
-            lut2.maoEsquerdaCabeca = False
-            lut2.soco()
+            lutador2.maoEsquerdaCabeca = True
+        if not colisao(r1, r2) and lutador2.maoEsquerdaCabeca:
+            lutador2.maoEsquerdaCabeca = False
+            lutador2.soco()
 
     r1 = None
 
-    if lut2.maoDireitaCoord is not None:
-        (x1, y1), (x2, y2) = lut2.maoDireitaCoord
+    if lutador2.roi_mao_direita is not None:
+        (x1, y1), (x2, y2) = lutador2.roi_mao_direita
         r1 = x1, y1, x2, y2
 
-    if lut1.cabeca is not None:
-        (x1, y1), (x2, y2) = lut1.cabeca
+    if lutador1.roi_cabeca is not None:
+        (x1, y1), (x2, y2) = lutador1.roi_cabeca
         r2 = x1, y1, x2, y2
 
     if r1 is not None and r2 is not None:
         if colisao(r1, r2):
-            lut2.maoDireitaCabeca = True
-        if not colisao(r1, r2) and lut2.maoDireitaCabeca:
-            lut2.maoDireitaCabeca = False
-            lut2.soco()
+            lutador2.maoDireitaCabeca = True
+        if not colisao(r1, r2) and lutador2.maoDireitaCabeca:
+            lutador2.maoDireitaCabeca = False
+            lutador2.soco()
 
     r1 = None
     r2 = None
 
     # ----------------------------------------------------------------------------------------
 
-    frame_lutador[frame_count].update({'lutador_1': lut1})
-    frame_lutador[frame_count].update({'lutador_2': lut2})
+    frame_lutador[frame_count].update({'lutador_1': lutador1})
+    frame_lutador[frame_count].update({'lutador_2': lutador2})

@@ -1,20 +1,20 @@
 import numpy as np
 import cv2
 
+from python.yolo.moduloDefineCoordenadas import cabeca_coordenadas
 
-def cabecaCoordenadas(imagem, keypoints_numpy):
+
+def roi_cabeca(imagem, keypoints_numpy):
+    (x, y) = cabeca_coordenadas(imagem, keypoints_numpy)
     # nose: 0
-    x = int(keypoints_numpy[0][0] * imagem.shape[1])
-
-    y = int(keypoints_numpy[0][1] * imagem.shape[0])
 
     if x != 0 and y != 0:
 
         start_point = (x-30, y-30)
         end_point = (x+30, y+30)
 
-        cabecaCoord = (start_point, end_point)
-        return cabecaCoord
+        roiCabeca = (start_point, end_point)
+        return roiCabeca
     else:
         return None
 

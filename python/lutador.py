@@ -1,5 +1,5 @@
 class Lutador:
-    def __init__(self, identificador, cor, socos=0, coordenadas=None, box=None, cabeca=None, tronco=None, linhasCinturas=None, maoEsquerdaCoord=None, maoDireitaCoord=None):
+    def __init__(self, identificador, cor, socos=0, coordenadas=None, box=None, roi_cabeca=None, roi_tronco=None, roi_linha_cintura=None, roi_mao_esquerda=None, roi_mao_direita=None):
         # 'identificador' diferencia os lutadores.
         self.identificador = identificador
         self.cor = cor
@@ -13,11 +13,11 @@ class Lutador:
 
         self.box = box
 
-        self.cabeca = cabeca
-        self.tronco = tronco
-        self.linhasCinturas = linhasCinturas
-        self.maoEsquerdaCoord = maoEsquerdaCoord
-        self.maoDireitaCoord = maoDireitaCoord
+        self.roi_cabeca = roi_cabeca
+        self.roi_tronco = roi_tronco
+        self.roi_linha_cintura = roi_linha_cintura
+        self.roi_mao_esquerda = roi_mao_esquerda
+        self.roi_mao_direita = roi_mao_direita
 
         self.maoDireitaCabeca = False
         self.maoEsquerdaCabeca = False

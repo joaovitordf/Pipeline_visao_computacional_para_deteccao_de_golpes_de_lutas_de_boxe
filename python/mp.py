@@ -7,7 +7,6 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from mediapipe.framework.formats import landmark_pb2
-from meioQuadrado import ponto_central
 import time
 import utils
 

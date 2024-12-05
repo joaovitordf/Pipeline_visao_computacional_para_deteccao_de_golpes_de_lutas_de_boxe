@@ -20,3 +20,16 @@ def ponto_central(A, B, C, D):
     centroide = np.mean(pontos_array, axis=0)
 
     return centroide
+
+def moduloMeioLutadores(frame_count, lutador1, lutador2):
+    # Ombro esquerdo 5
+    #print(lutador1)
+
+    # Ombro direito 6
+
+    # Cintura esquerda 11
+
+    # Cintura direita 12
+
+    #print(lut1)
+    pass

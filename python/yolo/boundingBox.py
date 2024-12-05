@@ -9,7 +9,7 @@ from yolo.identificaGolpe import golpe
 
 from yolo.roiParts import linhaCintura, maoEsquerda, maoDireita, troncoCoordenadas
 
-from python.yolo.roiParts import cabecaCoordenadas
+from python.yolo.roiParts import roi_cabeca
 
 
 def pernaCoordenadas(imagem, keypoints):
@@ -74,29 +74,29 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
         identifica_lutador = define_lutador(lutador1, lutador2, cor[0])
         if identifica_lutador == 1:
             lutador1.identificador = 1
-            cabeca = cabecaCoordenadas(frame, keypoints_numpy)
-            tronco = troncoCoordenadas(frame, keypoints_numpy)
-            linhasCinturas = linhaCintura(frame, keypoints_numpy)
-            maoEsquerdaCoord = maoEsquerda(frame, keypoints_numpy)
-            maoDireitaCoord = maoDireita(frame, keypoints_numpy)
-            lutador1.cabeca = cabeca
-            lutador1.tronco = tronco
-            lutador1.linhasCinturas = linhasCinturas
-            lutador1.maoEsquerdaCoord = maoEsquerdaCoord
-            lutador1.maoDireitaCoord = maoDireitaCoord
+            roiCabeca = roi_cabeca(frame, keypoints_numpy)
+            roiTronco = troncoCoordenadas(frame, keypoints_numpy)
+            roiLinhaCintura = linhaCintura(frame, keypoints_numpy)
+            roi_mao_esquerda = maoEsquerda(frame, keypoints_numpy)
+            roi_mao_direita = maoDireita(frame, keypoints_numpy)
+            lutador1.roi_cabeca = roiCabeca
+            lutador1.roi_tronco = roiTronco
+            lutador1.roi_linha_cintura = roiLinhaCintura
+            lutador1.roi_mao_esquerda = roi_mao_esquerda
+            lutador1.roi_mao_direita = roi_mao_direita
             frame_lutador[frame_count].update({'lutador_1': lutador1})
         elif identifica_lutador == 2:
             lutador2.identificador = 2
-            cabeca = cabecaCoordenadas(frame, keypoints_numpy)
-            tronco = troncoCoordenadas(frame, keypoints_numpy)
-            linhasCinturas = linhaCintura(frame, keypoints_numpy)
-            maoEsquerdaCoord = maoEsquerda(frame, keypoints_numpy)
-            maoDireitaCoord = maoDireita(frame, keypoints_numpy)
-            lutador2.cabeca = cabeca
-            lutador2.tronco = tronco
-            lutador2.linhasCinturas = linhasCinturas
-            lutador2.maoEsquerdaCoord = maoEsquerdaCoord
-            lutador2.maoDireitaCoord = maoDireitaCoord
+            roiCabeca = roi_cabeca(frame, keypoints_numpy)
+            roiTronco = troncoCoordenadas(frame, keypoints_numpy)
+            roiLinhaCintura = linhaCintura(frame, keypoints_numpy)
+            roi_mao_esquerda = maoEsquerda(frame, keypoints_numpy)
+            roi_mao_direita = maoDireita(frame, keypoints_numpy)
+            lutador2.roi_cabeca = roiCabeca
+            lutador2.roi_tronco = roiTronco
+            lutador2.roi_linha_cintura = roiLinhaCintura
+            lutador2.roi_mao_esquerda = roi_mao_esquerda
+            lutador2.roi_mao_direita = roi_mao_direita
             lutador2.coordenadas = keypoints_numpy
             frame_lutador[frame_count].update({'lutador_2': lutador2})
 
@@ -135,36 +135,36 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
             label_lutador = "Lutador " + str(identifica_lutador)
             annotator.box_label(b, label_lutador, color=(0, 255, 0))
 
-            if lutador1.cabeca is not None:
-                start, end = lutador1.cabeca
+            if lutador1.roi_cabeca is not None:
+                start, end = lutador1.roi_cabeca
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
-            if lutador1.tronco is not None:
-                start, end = lutador1.tronco
+            if lutador1.roi_tronco is not None:
+                start, end = lutador1.roi_tronco
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
-            if lutador1.linhasCinturas is not None:
-                start, end = lutador1.linhasCinturas
+            if lutador1.roi_linha_cintura is not None:
+                start, end = lutador1.roi_linha_cintura
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
-            if lutador1.maoEsquerdaCoord is not None:
-                start, end = lutador1.maoEsquerdaCoord
+            if lutador1.roi_mao_esquerda is not None:
+                start, end = lutador1.roi_mao_esquerda
                 annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
-            if lutador1.maoDireitaCoord is not None:
-                start, end = lutador1.maoDireitaCoord
+            if lutador1.roi_mao_direita is not None:
+                start, end = lutador1.roi_mao_direita
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
 
-            if lutador2.cabeca is not None:
-                start, end = lutador2.cabeca
+            if lutador2.roi_cabeca is not None:
+                start, end = lutador2.roi_cabeca
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
-            if lutador2.tronco is not None:
-                start, end = lutador2.tronco
+            if lutador2.roi_tronco is not None:
+                start, end = lutador2.roi_tronco
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
-            if lutador2.linhasCinturas is not None:
-                start, end = lutador2.linhasCinturas
+            if lutador2.roi_linha_cintura is not None:
+                start, end = lutador2.roi_linha_cintura
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
-            if lutador2.maoEsquerdaCoord is not None:
-                start, end = lutador2.maoEsquerdaCoord
+            if lutador2.roi_mao_esquerda is not None:
+                start, end = lutador2.roi_mao_esquerda
                 annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
-            if lutador2.maoDireitaCoord is not None:
-                start, end = lutador2.maoDireitaCoord
+            if lutador2.roi_mao_direita is not None:
+                start, end = lutador2.roi_mao_direita
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
 
             contador += 1
@@ -183,12 +183,12 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
         for linha in linhasCinturas:
             (start, end) = linha
             annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 10)
-        maoEsquerdaCoord = maoEsquerda(frame, results)
-        for maoEsq in maoEsquerdaCoord:
+        roi_mao_esquerda = maoEsquerda(frame, results)
+        for maoEsq in roi_mao_esquerda:
             (start, end) = maoEsq
             annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
-        maoDireitaCoord = maoDireita(frame, results)
-        for maoDir in maoDireitaCoord:
+        roi_mao_direita = maoDireita(frame, results)
+        for maoDir in roi_mao_direita:
             (start, end) = maoDir
             annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)"""
         return annotator

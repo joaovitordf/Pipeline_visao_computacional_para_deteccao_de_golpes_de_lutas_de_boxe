@@ -17,7 +17,7 @@ from lutador import Lutador
 def main():
     model_path = utils.retorna_diretorio("pesos/yolov8m-pose.pt")
 
-    video_source = utils.retorna_diretorio("videos/videoteste.mp4")
+    video_source = utils.retorna_diretorio("videos/videocompletocorte.mp4")
 
     imagem_source = utils.retorna_diretorio("videos/imagemBoxe.png")
 
