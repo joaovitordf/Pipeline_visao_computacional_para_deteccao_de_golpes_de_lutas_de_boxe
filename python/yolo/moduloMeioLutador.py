@@ -23,7 +23,8 @@ def ponto_central(A, B, C, D):
 
 def moduloMeioLutadores(frame_count, lutador1, lutador2):
     # Ombro esquerdo 5
-    #print(lutador1)
+    #continua daqui
+    #print(lutador1.nose)
 
     # Ombro direito 6
 

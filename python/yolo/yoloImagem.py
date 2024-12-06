@@ -71,7 +71,7 @@ def draw_boundingBox(image, keypoints):
 
     return recorte
 
-def troncoCoordenadas(imagem, keypoints):
+def roi_tronco(imagem, keypoints):
 
     x1 = int(keypoints[6][0]*imagem.shape[1])
 
@@ -116,7 +116,7 @@ def yoloImagem(model, caminho_imagem):
         for pessoa in keypoints:
             keypoints_numpy = pessoa.xyn.cpu().numpy()[0]
             #draw_boundingBox(imagem, keypoints_numpy)
-            imagens_pessoa.append(troncoCoordenadas(imagem, keypoints_numpy))
+            imagens_pessoa.append(roi_tronco(imagem, keypoints_numpy))
 
         for pessoa in imagens_pessoa:
             teste = DominantColors(pessoa, 1)

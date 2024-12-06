@@ -89,7 +89,7 @@ class DominantColors:
         plt.show()"""
 
 
-def troncoCoordenadas(imagem, keypoints):
+def roi_tronco(imagem, keypoints):
     x1 = int(keypoints[6][0] * imagem.shape[1])
 
     y1 = int(keypoints[6][1] * imagem.shape[0])

@@ -43,9 +43,9 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
 
     if r1 is not None and r2 is not None:
         if colisao(r1, r2):
-            lutador1.maoEsquerdaCabeca = True
-        if not colisao(r1, r2) and lutador1.maoEsquerdaCabeca:
-            lutador1.maoEsquerdaCabeca = False
+            lutador1.roi_mao_esquerdaCabeca = True
+        if not colisao(r1, r2) and lutador1.roi_mao_esquerdaCabeca:
+            lutador1.roi_mao_esquerdaCabeca = False
             lutador1.soco()
 
     r1 = None
@@ -57,9 +57,9 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
 
     if r1 is not None and r2 is not None:
         if colisao(r1, r2):
-            lutador1.maoDireitaCabeca = True
-        if not colisao(r1, r2) and lutador1.maoDireitaCabeca:
-            lutador1.maoDireitaCabeca = False
+            lutador1.roi_mao_direitaCabeca = True
+        if not colisao(r1, r2) and lutador1.roi_mao_direitaCabeca:
+            lutador1.roi_mao_direitaCabeca = False
             lutador1.soco()
 
     # ----------------------------------------------------------------------------------------
@@ -78,9 +78,9 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
 
     if r1 is not None and r2 is not None:
         if colisao(r1, r2):
-            lutador2.maoEsquerdaCabeca = True
-        if not colisao(r1, r2) and lutador2.maoEsquerdaCabeca:
-            lutador2.maoEsquerdaCabeca = False
+            lutador2.roi_mao_esquerdaCabeca = True
+        if not colisao(r1, r2) and lutador2.roi_mao_esquerdaCabeca:
+            lutador2.roi_mao_esquerdaCabeca = False
             lutador2.soco()
 
     r1 = None
@@ -95,9 +95,9 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
 
     if r1 is not None and r2 is not None:
         if colisao(r1, r2):
-            lutador2.maoDireitaCabeca = True
-        if not colisao(r1, r2) and lutador2.maoDireitaCabeca:
-            lutador2.maoDireitaCabeca = False
+            lutador2.roi_mao_direitaCabeca = True
+        if not colisao(r1, r2) and lutador2.roi_mao_direitaCabeca:
+            lutador2.roi_mao_direitaCabeca = False
             lutador2.soco()
 
     r1 = None

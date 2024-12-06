@@ -1,11 +1,11 @@
 import numpy as np
 import cv2
 
-from python.yolo.moduloDefineCoordenadas import cabeca_coordenadas
+from python.yolo.moduloDefineCoordenadas import nose_coordenadas
 
 
 def roi_cabeca(imagem, keypoints_numpy):
-    (x, y) = cabeca_coordenadas(imagem, keypoints_numpy)
+    (x, y) = nose_coordenadas(imagem, keypoints_numpy)
     # nose: 0
 
     if x != 0 and y != 0:
@@ -19,7 +19,7 @@ def roi_cabeca(imagem, keypoints_numpy):
         return None
 
 
-def maoEsquerda(imagem, keypoints_numpy):
+def roi_mao_esquerda(imagem, keypoints_numpy):
     # left-writs: 9
     x = int(keypoints_numpy[9][0] * imagem.shape[1])
 
@@ -37,7 +37,7 @@ def maoEsquerda(imagem, keypoints_numpy):
         return None
 
 
-def maoDireita(imagem, keypoints_numpy):
+def roi_mao_direita(imagem, keypoints_numpy):
     # right-writs: 10
     x = int(keypoints_numpy[10][0] * imagem.shape[1])
 
@@ -53,7 +53,7 @@ def maoDireita(imagem, keypoints_numpy):
     else:
         return None
 
-def linhaCintura(imagem, keypoints_numpy):
+def roi_linha_cintura(imagem, keypoints_numpy):
     # left-hip: 11
     # right-hip: 12
     x1 = int(keypoints_numpy[11][0] * imagem.shape[1])
@@ -79,13 +79,13 @@ def linhaCintura(imagem, keypoints_numpy):
 
 
 
-        linhaCinturaCoord = (start_point, end_point)
+        roi_linha_cinturaCoord = (start_point, end_point)
 
-        return linhaCinturaCoord
+        return roi_linha_cinturaCoord
     else:
         return None
 
-def troncoCoordenadas(imagem, keypoints_numpy):
+def roi_tronco(imagem, keypoints_numpy):
     # right-shoulder: 6
     # left-hip: 11
     x1 = int(keypoints_numpy[6][0] * imagem.shape[1])

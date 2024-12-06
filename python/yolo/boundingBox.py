@@ -7,8 +7,9 @@ from yolo.clusteriza import DominantColors, clusterizaFunction
 from yolo.identificaColisao import colisao
 from yolo.identificaGolpe import golpe
 
-from yolo.roiParts import linhaCintura, maoEsquerda, maoDireita, troncoCoordenadas
+from yolo.roiParts import roi_linha_cintura, roi_mao_esquerda, roi_mao_direita, roi_tronco
 
+from python.yolo.moduloDefineCoordenadas import *
 from python.yolo.roiParts import roi_cabeca
 
 
@@ -75,29 +76,69 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
         if identifica_lutador == 1:
             lutador1.identificador = 1
             roiCabeca = roi_cabeca(frame, keypoints_numpy)
-            roiTronco = troncoCoordenadas(frame, keypoints_numpy)
-            roiLinhaCintura = linhaCintura(frame, keypoints_numpy)
-            roi_mao_esquerda = maoEsquerda(frame, keypoints_numpy)
-            roi_mao_direita = maoDireita(frame, keypoints_numpy)
+            roiTronco = roi_tronco(frame, keypoints_numpy)
+            roiLinhaCintura = roi_linha_cintura(frame, keypoints_numpy)
+            roiMaoEsquerda = roi_mao_esquerda(frame, keypoints_numpy)
+            roiMaoDireita = roi_mao_direita(frame, keypoints_numpy)
             lutador1.roi_cabeca = roiCabeca
             lutador1.roi_tronco = roiTronco
             lutador1.roi_linha_cintura = roiLinhaCintura
-            lutador1.roi_mao_esquerda = roi_mao_esquerda
-            lutador1.roi_mao_direita = roi_mao_direita
+            lutador1.roi_mao_esquerda = roiMaoEsquerda
+            lutador1.roi_mao_direita = roiMaoDireita
+
+            # COORDENADAS DE CADA KEYPOINT DOS LUTADORES SENDO ARMAZENADO
+            lutador1.nose = nose_coordenadas(frame, keypoints_numpy)
+            lutador1.left_eye = left_eye_coordenadas(frame, keypoints_numpy)
+            lutador1.right_eye = right_eye_coordenadas(frame, keypoints_numpy)
+            lutador1.left_ear = left_ear_coordenadas(frame, keypoints_numpy)
+            lutador1.right_ear = right_ear_coordenadas(frame, keypoints_numpy)
+            lutador1.left_shoulder = left_shoulder_coordenadas(frame, keypoints_numpy)
+            lutador1.right_shoulder = right_shoulder_coordenadas(frame, keypoints_numpy)
+            lutador1.left_elbow = left_elbow_coordenadas(frame, keypoints_numpy)
+            lutador1.right_elbow = right_elbow_coordenadas(frame, keypoints_numpy)
+            lutador1.left_wrist = left_wrist_coordenadas(frame, keypoints_numpy)
+            lutador1.right_wrist = right_wrist_coordenadas(frame, keypoints_numpy)
+            lutador1.left_hip = left_hip_coordenadas(frame, keypoints_numpy)
+            lutador1.right_hip = right_hip_coordenadas(frame, keypoints_numpy)
+            lutador1.left_knee = left_knee_coordenadas(frame, keypoints_numpy)
+            lutador1.right_knee = right_knee_coordenadas(frame, keypoints_numpy)
+            lutador1.left_ankle = left_ankle_coordenadas(frame, keypoints_numpy)
+            lutador1.right_ankle = right_ankle_coordenadas(frame, keypoints_numpy)
+
             frame_lutador[frame_count].update({'lutador_1': lutador1})
         elif identifica_lutador == 2:
             lutador2.identificador = 2
             roiCabeca = roi_cabeca(frame, keypoints_numpy)
-            roiTronco = troncoCoordenadas(frame, keypoints_numpy)
-            roiLinhaCintura = linhaCintura(frame, keypoints_numpy)
-            roi_mao_esquerda = maoEsquerda(frame, keypoints_numpy)
-            roi_mao_direita = maoDireita(frame, keypoints_numpy)
+            roiTronco = roi_tronco(frame, keypoints_numpy)
+            roiLinhaCintura = roi_linha_cintura(frame, keypoints_numpy)
+            roiMaoEsquerda = roi_mao_esquerda(frame, keypoints_numpy)
+            roiMaoDireita = roi_mao_direita(frame, keypoints_numpy)
             lutador2.roi_cabeca = roiCabeca
             lutador2.roi_tronco = roiTronco
             lutador2.roi_linha_cintura = roiLinhaCintura
-            lutador2.roi_mao_esquerda = roi_mao_esquerda
-            lutador2.roi_mao_direita = roi_mao_direita
+            lutador2.roi_mao_esquerda = roiMaoEsquerda
+            lutador2.roi_mao_direita = roiMaoDireita
             lutador2.coordenadas = keypoints_numpy
+
+            # COORDENADAS DE CADA KEYPOINT DOS LUTADORES SENDO ARMAZENADO
+            lutador2.nose = nose_coordenadas(frame, keypoints_numpy)
+            lutador2.left_eye = left_eye_coordenadas(frame, keypoints_numpy)
+            lutador2.right_eye = right_eye_coordenadas(frame, keypoints_numpy)
+            lutador2.left_ear = left_ear_coordenadas(frame, keypoints_numpy)
+            lutador2.right_ear = right_ear_coordenadas(frame, keypoints_numpy)
+            lutador2.left_shoulder = left_shoulder_coordenadas(frame, keypoints_numpy)
+            lutador2.right_shoulder = right_shoulder_coordenadas(frame, keypoints_numpy)
+            lutador2.left_elbow = left_elbow_coordenadas(frame, keypoints_numpy)
+            lutador2.right_elbow = right_elbow_coordenadas(frame, keypoints_numpy)
+            lutador2.left_wrist = left_wrist_coordenadas(frame, keypoints_numpy)
+            lutador2.right_wrist = right_wrist_coordenadas(frame, keypoints_numpy)
+            lutador2.left_hip = left_hip_coordenadas(frame, keypoints_numpy)
+            lutador2.right_hip = right_hip_coordenadas(frame, keypoints_numpy)
+            lutador2.left_knee = left_knee_coordenadas(frame, keypoints_numpy)
+            lutador2.right_knee = right_knee_coordenadas(frame, keypoints_numpy)
+            lutador2.left_ankle = left_ankle_coordenadas(frame, keypoints_numpy)
+            lutador2.right_ankle = right_ankle_coordenadas(frame, keypoints_numpy)
+
             frame_lutador[frame_count].update({'lutador_2': lutador2})
 
     annotated_frame = results[0].plot(boxes=False)
@@ -174,20 +215,20 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
         for c in cab:
             (start, end) = c
             annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
-        tronco = troncoCoordenadas(frame, results)
+        tronco = roi_tronco(frame, results)
         for tron in tronco:
             (start, end) = tron
             annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
 
-        linhasCinturas = linhaCintura(frame, results)
+        linhasCinturas = roi_linha_cintura(frame, results)
         for linha in linhasCinturas:
             (start, end) = linha
             annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 10)
-        roi_mao_esquerda = maoEsquerda(frame, results)
+        roi_mao_esquerda = roi_mao_esquerda(frame, results)
         for maoEsq in roi_mao_esquerda:
             (start, end) = maoEsq
             annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
-        roi_mao_direita = maoDireita(frame, results)
+        roi_mao_direita = roi_mao_direita(frame, results)
         for maoDir in roi_mao_direita:
             (start, end) = maoDir
             annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)"""
