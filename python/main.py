@@ -38,15 +38,16 @@ def main():
             try:
                 frame_lutador[frame_count] = {'frame': frame_count, 'lutador_1': lutador1, 'lutador_2': lutador2}
                 #lutador1.socos += 1
-                cores = clusterizaFunction(frame, results)
+                cores = clusterizaFunction(frame, results, lutador1, lutador2, frame_lutador, frame_count)
                 annotator = boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
-                colisao = automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
                 annotated_frame = annotator.result()
+                annotated_frame = automatoColisao(annotated_frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
                 altura, largura, _ = np.shape(annotated_frame)
                 frame = cv2.resize(annotated_frame, (int((largura * 0.6)), int((altura * 0.6))))
                 cv2.imshow("teste", frame)
             except Exception as e:
-                print(f"Erro ao processar o frame: {e}")
+                pass
+                #print(f"Erro ao processar o frame: {e}")
 
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break

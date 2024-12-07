@@ -173,7 +173,12 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
             box = b.tolist()
             areaLutador.append(box)
 
-            label_lutador = "Lutador " + str(identifica_lutador)
+            if identifica_lutador == 1:
+                label_lutador = f"Lutador 1: {lutador1.socos}"
+            elif identifica_lutador == 2:
+                label_lutador = f"Lutador 2: {lutador2.socos}"
+            else:
+                label_lutador = "Lutador desconhecido"
             annotator.box_label(b, label_lutador, color=(0, 255, 0))
 
             if lutador1.roi_cabeca is not None:
@@ -187,7 +192,7 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
             if lutador1.roi_mao_esquerda is not None:
                 start, end = lutador1.roi_mao_esquerda
-                annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
             if lutador1.roi_mao_direita is not None:
                 start, end = lutador1.roi_mao_direita
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
@@ -203,7 +208,7 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
             if lutador2.roi_mao_esquerda is not None:
                 start, end = lutador2.roi_mao_esquerda
-                annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
             if lutador2.roi_mao_direita is not None:
                 start, end = lutador2.roi_mao_direita
                 annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)

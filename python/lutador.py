@@ -3,7 +3,7 @@ class Lutador:
                  roi_linha_cintura=None, roi_mao_esquerda=None, roi_mao_direita=None, nose=None, left_eye=None,
                  right_eye=None, left_ear=None, right_ear=None, left_shoulder=None, right_shoulder=None,
                  left_elbow=None, right_elbow=None, left_wrist=None, right_wrist=None, left_hip=None,
-                 right_hip=None, left_knee=None, right_knee=None, left_ankle=None, right_ankle=None):
+                 right_hip=None, left_knee=None, right_knee=None, left_ankle=None, right_ankle=None, distancia=None):
 
         # 'identificador' diferencia os lutadores.
         self.identificador = identificador
@@ -26,6 +26,8 @@ class Lutador:
 
         self.roi_mao_direitaCabeca = False
         self.roi_mao_esquerdaCabeca = False
+
+        self.distancia = distancia
 
         # COORDENADAS DE CADA KEYPOINT DO LUTADOR
 

@@ -151,27 +151,35 @@ def pernaCoordenadas(imagem, keypoints):
     return recorte
 
 
-def clusterizaFunction(imagem, results):
+def clusterizaFunction(imagem, results, lutador1, lutador2, frame_lutador, frame_count):
     cores = []
-    if hasattr(results[0], 'keypoints'):
-        # Access the keypoints for the first detected object
-        keypoints = results[0].keypoints
-        # Convert keypoints to numpy array and access the keypoints for the first detected object
-        imagens_pessoa = list()
-        for pessoa in keypoints:
+    #print(lutador1.distancia)
+    if hasattr(results[0], 'keypoints') and results[0].keypoints is not None:
+        # Lista para armazenar as imagens recortadas
+        imagens_pessoa = []
+        # Itera sobre os keypoints detectados
+        for pessoa in results[0].keypoints:
             keypoints_numpy = pessoa.xyn.cpu().numpy()[0]
             #draw_boundingBox(imagem, keypoints_numpy)
-            imagens_pessoa.append(pernaCoordenadas(imagem, keypoints_numpy))
+            # Obtém o recorte da imagem com base nos keypoints
+            recorte = pernaCoordenadas(imagem, keypoints_numpy)
 
-        for pessoa in imagens_pessoa:
-            if pessoa.size == 0:
-                print("Recorte vazio, pulando processamento.")
+            if recorte.size == 0:
+                #print("Recorte vazio, pulando processamento.")
                 continue
+
+            imagens_pessoa.append(recorte)
+
+        # Processa os recortes para obter cores dominantes
+        for pessoa in imagens_pessoa:
             try:
-                teste = DominantColors(pessoa, 1)
-                cor = teste.dominantColors()
+                dominante = DominantColors(pessoa, 1)
+                cor = dominante.dominantColors()
                 cores.append(cor[0])
             except ValueError as e:
-                print(f"Erro ao processar a imagem: {e}")
+                pass
+                #print(f"Erro ao processar a imagem: {e}")
+    else:
+        print("Keypoints não encontrados ou inválidos no resultado.")
 
-        return cores
+    return cores

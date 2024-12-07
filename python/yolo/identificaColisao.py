@@ -24,86 +24,94 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
     # Atravessou roi da cabeca ou corpo
 
     # Recebe as coordenadas se forem validas continua na funcao
-    moduloMeioLutadores(frame_count, lutador1, lutador2)
+    frame = moduloMeioLutadores(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
 
-    keypoints = results[0].keypoints
+    #keypoints = results[0].keypoints
 
-    # ----------------------------- Possivel ataque do lutador 1 -----------------------------
-    r1 = None
-    r2 = None
+    if lutador1.distancia is not None and lutador1.distancia > 180:
 
-    # Golpe de mao esquerda do lutador 1 no lutador 2
-    if lutador1.roi_mao_esquerda is not None:
-        (x1, y1), (x2, y2) = lutador1.roi_mao_esquerda
-        r1 = x1, y1, x2, y2
+        # ----------------------------- Possivel ataque do lutador 1 -----------------------------
+        r1 = None
+        r2 = None
 
-    if lutador2.roi_cabeca is not None:
-        (x1, y1), (x2, y2) = lutador2.roi_cabeca
-        r2 = x1, y1, x2, y2
+        # Golpe de mao esquerda do lutador 1 no lutador 2
+        if lutador1.roi_mao_esquerda is not None:
+            (x1, y1), (x2, y2) = lutador1.roi_mao_esquerda
+            r1 = x1, y1, x2, y2
 
-    if r1 is not None and r2 is not None:
-        if colisao(r1, r2):
-            lutador1.roi_mao_esquerdaCabeca = True
-        if not colisao(r1, r2) and lutador1.roi_mao_esquerdaCabeca:
-            lutador1.roi_mao_esquerdaCabeca = False
-            lutador1.soco()
+        if lutador2.roi_cabeca is not None:
+            (x1, y1), (x2, y2) = lutador2.roi_cabeca
+            r2 = x1, y1, x2, y2
 
-    r1 = None
+        if r1 is not None and r2 is not None:
+            if colisao(r1, r2):
+                lutador1.roi_mao_esquerdaCabeca = True
+            if not colisao(r1, r2) and lutador1.roi_mao_esquerdaCabeca:
+                lutador1.roi_mao_esquerdaCabeca = False
+                print(lutador1.distancia)
+                lutador1.soco()
 
-    # Golpe de mao direita do lutador 1 no lutador 2
-    if lutador1.roi_mao_direita is not None:
-        (x1, y1), (x2, y2) = lutador1.roi_mao_direita
-        r1 = x1, y1, x2, y2
+        r1 = None
 
-    if r1 is not None and r2 is not None:
-        if colisao(r1, r2):
-            lutador1.roi_mao_direitaCabeca = True
-        if not colisao(r1, r2) and lutador1.roi_mao_direitaCabeca:
-            lutador1.roi_mao_direitaCabeca = False
-            lutador1.soco()
+        # Golpe de mao direita do lutador 1 no lutador 2
+        if lutador1.roi_mao_direita is not None:
+            (x1, y1), (x2, y2) = lutador1.roi_mao_direita
+            r1 = x1, y1, x2, y2
 
-    # ----------------------------------------------------------------------------------------
+        if r1 is not None and r2 is not None:
+            if colisao(r1, r2):
+                lutador1.roi_mao_direitaCabeca = True
+            if not colisao(r1, r2) and lutador1.roi_mao_direitaCabeca:
+                lutador1.roi_mao_direitaCabeca = False
+                print(lutador1.distancia)
+                lutador1.soco()
 
-    # ----------------------------- Possivel ataque do lutador 2 -----------------------------
-    r1 = None
-    r2 = None
+        # ----------------------------------------------------------------------------------------
 
-    if lutador2.roi_mao_esquerda is not None:
-        (x1, y1), (x2, y2) = lutador2.roi_mao_esquerda
-        r1 = x1, y1, x2, y2
+        # ----------------------------- Possivel ataque do lutador 2 -----------------------------
+        r1 = None
+        r2 = None
 
-    if lutador1.roi_cabeca is not None:
-        (x1, y1), (x2, y2) = lutador1.roi_cabeca
-        r2 = x1, y1, x2, y2
+        if lutador2.roi_mao_esquerda is not None:
+            (x1, y1), (x2, y2) = lutador2.roi_mao_esquerda
+            r1 = x1, y1, x2, y2
 
-    if r1 is not None and r2 is not None:
-        if colisao(r1, r2):
-            lutador2.roi_mao_esquerdaCabeca = True
-        if not colisao(r1, r2) and lutador2.roi_mao_esquerdaCabeca:
-            lutador2.roi_mao_esquerdaCabeca = False
-            lutador2.soco()
+        if lutador1.roi_cabeca is not None:
+            (x1, y1), (x2, y2) = lutador1.roi_cabeca
+            r2 = x1, y1, x2, y2
 
-    r1 = None
+        if r1 is not None and r2 is not None:
+            if colisao(r1, r2):
+                lutador2.roi_mao_esquerdaCabeca = True
+            if not colisao(r1, r2) and lutador2.roi_mao_esquerdaCabeca:
+                lutador2.roi_mao_esquerdaCabeca = False
+                print(lutador1.distancia)
+                lutador2.soco()
 
-    if lutador2.roi_mao_direita is not None:
-        (x1, y1), (x2, y2) = lutador2.roi_mao_direita
-        r1 = x1, y1, x2, y2
+        r1 = None
 
-    if lutador1.roi_cabeca is not None:
-        (x1, y1), (x2, y2) = lutador1.roi_cabeca
-        r2 = x1, y1, x2, y2
+        if lutador2.roi_mao_direita is not None:
+            (x1, y1), (x2, y2) = lutador2.roi_mao_direita
+            r1 = x1, y1, x2, y2
 
-    if r1 is not None and r2 is not None:
-        if colisao(r1, r2):
-            lutador2.roi_mao_direitaCabeca = True
-        if not colisao(r1, r2) and lutador2.roi_mao_direitaCabeca:
-            lutador2.roi_mao_direitaCabeca = False
-            lutador2.soco()
+        if lutador1.roi_cabeca is not None:
+            (x1, y1), (x2, y2) = lutador1.roi_cabeca
+            r2 = x1, y1, x2, y2
 
-    r1 = None
-    r2 = None
+        if r1 is not None and r2 is not None:
+            if colisao(r1, r2):
+                lutador2.roi_mao_direitaCabeca = True
+            if not colisao(r1, r2) and lutador2.roi_mao_direitaCabeca:
+                lutador2.roi_mao_direitaCabeca = False
+                print(lutador1.distancia)
+                lutador2.soco()
 
-    # ----------------------------------------------------------------------------------------
+        r1 = None
+        r2 = None
 
-    frame_lutador[frame_count].update({'lutador_1': lutador1})
-    frame_lutador[frame_count].update({'lutador_2': lutador2})
+        # ----------------------------------------------------------------------------------------
+
+        frame_lutador[frame_count].update({'lutador_1': lutador1})
+        frame_lutador[frame_count].update({'lutador_2': lutador2})
+
+    return frame
