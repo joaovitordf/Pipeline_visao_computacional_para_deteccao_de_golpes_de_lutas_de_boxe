@@ -33,6 +33,7 @@ def main():
 
     while cap.isOpened():
         success, frame = cap.read()
+        frame_original = frame
         if success:
             results = model(frame, verbose=False, device="cuda")
             try:
@@ -41,7 +42,7 @@ def main():
                 cores = clusterizaFunction(frame, results, lutador1, lutador2, frame_lutador, frame_count)
                 annotator = boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
                 annotated_frame = annotator.result()
-                annotated_frame = automatoColisao(annotated_frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
+                annotated_frame = automatoColisao(annotated_frame, results, cores, lutador1, lutador2, frame_lutador, frame_count, frame_original)
                 altura, largura, _ = np.shape(annotated_frame)
                 frame = cv2.resize(annotated_frame, (int((largura * 0.6)), int((altura * 0.6))))
                 cv2.imshow("teste", frame)
