@@ -1,5 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter/scheduler.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,35 +29,39 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   MediaStream? _localStream;
-  RTCPeerConnection? _peerConnection;
+  Socket? _socket;
+  GlobalKey _videoKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _initializeRenderers();
     _initLocalStream();
-    _createPeerConnection();
+    _connectToServer();
   }
 
   @override
   void dispose() {
     _localRenderer.dispose();
     _localStream?.dispose();
-    _peerConnection?.close();
+    _socket?.close();
     super.dispose();
   }
 
-  // Inicializa o renderizador de vídeo
   Future<void> _initializeRenderers() async {
     await _localRenderer.initialize();
   }
 
-  // Captura o stream da câmera traseira, sem áudio
   Future<void> _initLocalStream() async {
     final Map<String, dynamic> mediaConstraints = {
       'audio': false,
       'video': {
-        'facingMode': 'environment', // utiliza a câmera traseira
+        'mandatory': {
+          'minWidth': '640',
+          'minHeight': '480',
+          'minFrameRate': '15',
+        },
+        'facingMode': 'environment',
       },
     };
 
@@ -61,65 +71,59 @@ class _HomePageState extends State<HomePage> {
         _localStream = stream;
         _localRenderer.srcObject = _localStream;
       });
+      _startFrameCapture();
     } catch (e) {
       print("Erro ao acessar a câmera: $e");
     }
   }
 
-  // Cria a conexão WebRTC, adiciona o stream local e gera a oferta SDP
-  Future<void> _createPeerConnection() async {
-    Map<String, dynamic> configuration = {
-      'iceServers': [
-        {'urls': 'stun:stun.l.google.com:19302'},
-      ]
-    };
+  WebSocket? _webSocket;
 
-    // Restrições para a oferta SDP
-    final Map<String, dynamic> offerSdpConstraints = {
-      'mandatory': {
-        'OfferToReceiveAudio': false,
-        'OfferToReceiveVideo': true,
-      },
-      'optional': [],
-    };
-
+  Future<void> _connectToServer() async {
     try {
-      _peerConnection = await createPeerConnection(configuration, offerSdpConstraints);
+      _webSocket = await WebSocket.connect('ws://192.168.1.102:8765');
+      print('Conectado ao servidor via WebSocket.');
 
-      // Adiciona cada faixa do stream local à conexão
-      if (_localStream != null) {
-        _localStream!.getTracks().forEach((track) {
-          _peerConnection!.addTrack(track, _localStream!);
-        });
-      }
-
-      // Cria a oferta SDP
-      RTCSessionDescription description = await _peerConnection!.createOffer(offerSdpConstraints);
-      await _peerConnection!.setLocalDescription(description);
-
-      // Serializa a oferta SDP (exemplo em JSON)
-      final offerData = {
-        'sdp': description.sdp,
-        'type': description.type,
-      };
-      print("Oferta SDP serializada: $offerData");
-
-      // TODO: Implemente a comunicação com o servidor (via WebSocket)
+      // Exemplo de como ouvir mensagens do servidor:
+      _webSocket!.listen((data) {
+        print('Mensagem recebida: $data');
+      });
 
     } catch (e) {
-      print("Erro ao criar a conexão WebRTC: $e");
+      print('Erro ao conectar ao servidor via WebSocket: $e');
     }
+  }
+
+  void _startFrameCapture() {
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      if (_webSocket != null && _videoKey.currentContext != null) {
+        RenderRepaintBoundary boundary =
+        _videoKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+
+        var image = await boundary.toImage(pixelRatio: 0.3);
+        ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+
+        if (byteData != null) {
+          Uint8List pngBytes = byteData.buffer.asUint8List();
+          String base64Frame = base64Encode(pngBytes);
+          _webSocket!.add(base64Frame); // Envia frame serializado via WebSocket
+          print('Frame enviado via WebSocket.');
+        }
+      }
+
+      Future.delayed(Duration(milliseconds: 66), _startFrameCapture);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('WebRTC App'),
-      ),
+      appBar: AppBar(title: Text('WebRTC App')),
       body: Center(
-        // Exibe o vídeo capturado localmente
-        child: RTCVideoView(_localRenderer),
+        child: RepaintBoundary(
+          key: _videoKey,
+          child: RTCVideoView(_localRenderer),
+        ),
       ),
     );
   }
