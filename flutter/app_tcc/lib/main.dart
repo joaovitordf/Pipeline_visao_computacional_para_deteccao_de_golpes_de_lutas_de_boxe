@@ -57,8 +57,8 @@ class _HomePageState extends State<HomePage> {
       'audio': false,
       'video': {
         'mandatory': {
-          'minWidth': '640',
-          'minHeight': '480',
+          'minWidth': '1280',
+          'minHeight': '720',
           'minFrameRate': '15',
         },
         'facingMode': 'environment',
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _connectToServer() async {
     try {
-      _webSocket = await WebSocket.connect('ws://192.168.1.102:8765');
+      _webSocket = await WebSocket.connect('ws://192.168.1.104:8765');
       print('Conectado ao servidor via WebSocket.');
 
       // Exemplo de como ouvir mensagens do servidor:
@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
         RenderRepaintBoundary boundary =
         _videoKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
 
-        var image = await boundary.toImage(pixelRatio: 0.3);
+        var image = await boundary.toImage(pixelRatio: 0.7);
         ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
 
         if (byteData != null) {
