@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
         RenderRepaintBoundary boundary =
         _videoKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
 
-        var image = await boundary.toImage(pixelRatio: 0.7);
+        var image = await boundary.toImage(pixelRatio: 0.5);
         ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
 
         if (byteData != null) {
@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
 
-      Future.delayed(Duration(milliseconds: 66), _startFrameCapture);
+      Future.delayed(Duration(milliseconds: 100), _startFrameCapture);
     });
   }
 

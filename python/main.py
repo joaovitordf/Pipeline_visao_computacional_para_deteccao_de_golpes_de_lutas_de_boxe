@@ -3,7 +3,6 @@ import websockets
 import base64
 import cv2
 import numpy as np
-from typing import Dict, Any
 from websockets.legacy.server import WebSocketServerProtocol
 
 from ultralytics import YOLO
@@ -13,12 +12,9 @@ from yolo.boundingBox import boundingBox
 from yolo.clusteriza import clusterizaFunction
 from lutador import Lutador
 
+global_context = None
 
-# Global context with type annotation
-global_context: Dict[str, Any] = {}
-
-def create_context() -> Dict[str, Any]:
-    # ... [same as before] ...
+def create_context():
     model_path = utils.retorna_diretorio("pesos/yolov8m-pose.pt")
     model = YOLO(model_path)
     lutador1 = Lutador(1, None, 0, None, None)
@@ -82,7 +78,6 @@ def main_video():
             break
 
         processed_frame = process_yolo(frame, frame_count_local, context)
-        # Redimensiona a imagem para visualização (ajuste o fator conforme necessário)
         cv2.imshow("Vídeo Processado", cv2.resize(
             processed_frame,
             (int(processed_frame.shape[1]), int(processed_frame.shape[0]))
@@ -98,14 +93,10 @@ def main_video():
 
 # ------------------ Modo Servidor ------------------
 
-frame_count = 0  # Contador global para o modo servidor
-
 async def handler(websocket: WebSocketServerProtocol) -> None:
-    global frame_count, global_context
-    assert global_context, "global_context must be initialized!"
+    frame_count = 0
     async for message in websocket:
         try:
-            # Decode the base64 message into an image
             img_data = base64.b64decode(message)
             nparr = np.frombuffer(img_data, np.uint8)
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -115,7 +106,6 @@ async def handler(websocket: WebSocketServerProtocol) -> None:
                 processed_frame = process_yolo(frame, frame_count, global_context)
                 print(f"Frame {frame_count} processado com sucesso.")
                 frame_count += 1
-                # Display the processed frame (resized for visualization)
                 cv2.imshow("Frame Processado", cv2.resize(
                     processed_frame,
                     (int(processed_frame.shape[1]), int(processed_frame.shape[0]))
@@ -125,8 +115,6 @@ async def handler(websocket: WebSocketServerProtocol) -> None:
             print(f"Erro ao processar o frame: {e}")
 
 async def main_server():
-    global global_context
-    global_context = create_context()
     async with websockets.serve(handler, "0.0.0.0", 8765):
         print("Servidor WebSocket rodando na porta 8765")
         await asyncio.Future()  # Mantém o servidor ativo indefinidamente
@@ -135,6 +123,7 @@ async def main_server():
 # ------------------ Escolha do Modo ------------------
 
 if __name__ == "__main__":
+    global_context = create_context()
     escolha = input(
         "Escolha uma opção:\n"
         "1: Usar vídeo já gravado\n"
