@@ -32,13 +32,6 @@ def colisao(r1, r2):
     return True
 
 def segmentar_imagem(imagem, conf):
-    """
-    Segmenta uma imagem usando YOLOv8 e retorna a imagem segmentada.
-
-    :param imagem: Imagem de entrada (numpy array).
-    :param conf: Limite de confiança para detecção.
-    :return: Imagem segmentada (numpy array com máscara binária).
-    """
     # Cria uma máscara preta com o mesmo tamanho da imagem
     background = np.zeros_like(imagem)
 
@@ -84,19 +77,6 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
 
                 x1, y1, x2, y2 = map(int, r1)
                 recorte = frame_original[y1:y2, x1:x2]
-
-                """sail_hsv = rgb2hsv(recorte)
-
-                # Definindo um valor de limiar no canal de saturação ou valor (V)
-                th = 0.4
-                sail_gray_bw = sail_hsv[..., 1] < th  # Usando o canal de saturação (S) para a comparação
-
-                # Converter a imagem binária (True/False) para 0/255 para exibição no OpenCV
-                sail_gray_bw_display = (sail_gray_bw * 255).astype('uint8')
-
-                # Mostrar a imagem binária
-                cv2.imshow("Recorte e Recorte Segmentado", sail_gray_bw_display)
-                #cv2.waitKey(0)"""
 
                 """recorte_segmentado = segmentar_imagem(recorte, conf=0.2)
 
@@ -174,6 +154,88 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
         r1 = None
         r2 = None
 
+        # ----------------------------------------------------------------------------------------
+
+        # ----------------------------- Possível ataque no tronco -----------------------------
+        r1 = None
+        r2 = None
+
+        # Golpe de mão esquerda do lutador 1 no tronco do lutador 2
+        if lutador1.roi_mao_esquerda is not None:
+            (x1, y1), (x2, y2) = lutador1.roi_mao_esquerda
+            r1 = x1, y1, x2, y2
+
+        if lutador2.roi_tronco is not None:
+            (x1, y1), (x2, y2) = lutador2.roi_tronco
+            r2 = x1, y1, x2, y2
+
+        if r1 is not None and r2 is not None:
+            if colisao(r1, r2):
+                lutador1.roi_mao_esquerdaTronco = True
+            if not colisao(r1, r2) and lutador1.roi_mao_esquerdaTronco:
+                lutador1.roi_mao_esquerdaTronco = False
+                print(lutador1.distancia)
+                lutador1.soco()
+
+        r1 = None
+        r2 = None
+
+        # Golpe de mão direita do lutador 1 no tronco do lutador 2
+        if lutador1.roi_mao_direita is not None:
+            (x1, y1), (x2, y2) = lutador1.roi_mao_direita
+            r1 = x1, y1, x2, y2
+
+        if lutador2.roi_tronco is not None:
+            (x1, y1), (x2, y2) = lutador2.roi_tronco
+            r2 = x1, y1, x2, y2
+
+        if r1 is not None and r2 is not None:
+            if colisao(r1, r2):
+                lutador1.roi_mao_direitaTronco = True
+            if not colisao(r1, r2) and lutador1.roi_mao_direitaTronco:
+                lutador1.roi_mao_direitaTronco = False
+                print(lutador1.distancia)
+                lutador1.soco()
+
+        r1 = None
+        r2 = None
+
+        # Golpe de mão esquerda do lutador 2 no tronco do lutador 1
+        if lutador2.roi_mao_esquerda is not None:
+            (x1, y1), (x2, y2) = lutador2.roi_mao_esquerda
+            r1 = x1, y1, x2, y2
+
+        if lutador1.roi_tronco is not None:
+            (x1, y1), (x2, y2) = lutador1.roi_tronco
+            r2 = x1, y1, x2, y2
+
+        if r1 is not None and r2 is not None:
+            if colisao(r1, r2):
+                lutador2.roi_mao_esquerdaTronco = True
+            if not colisao(r1, r2) and lutador2.roi_mao_esquerdaTronco:
+                lutador2.roi_mao_esquerdaTronco = False
+                print(lutador1.distancia)
+                lutador2.soco()
+
+        r1 = None
+        r2 = None
+
+        # Golpe de mão direita do lutador 2 no tronco do lutador 1
+        if lutador2.roi_mao_direita is not None:
+            (x1, y1), (x2, y2) = lutador2.roi_mao_direita
+            r1 = x1, y1, x2, y2
+
+        if lutador1.roi_tronco is not None:
+            (x1, y1), (x2, y2) = lutador1.roi_tronco
+            r2 = x1, y1, x2, y2
+
+        if r1 is not None and r2 is not None:
+            if colisao(r1, r2):
+                lutador2.roi_mao_direitaTronco = True
+            if not colisao(r1, r2) and lutador2.roi_mao_direitaTronco:
+                lutador2.roi_mao_direitaTronco = False
+                print(lutador1.distancia)
+                lutador2.soco()
         # ----------------------------------------------------------------------------------------
 
         frame_lutador[frame_count].update({'lutador_1': lutador1})

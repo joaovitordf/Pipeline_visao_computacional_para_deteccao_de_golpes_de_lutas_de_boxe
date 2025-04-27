@@ -27,6 +27,9 @@ class Lutador:
         self.roi_mao_direitaCabeca = False
         self.roi_mao_esquerdaCabeca = False
 
+        self.roi_mao_direitaTronco = False
+        self.roi_mao_esquerdaTronco = False
+
         self.distancia = distancia
 
         # COORDENADAS DE CADA KEYPOINT DO LUTADOR
@@ -55,19 +58,3 @@ class Lutador:
 
     def __str__(self):
         return f"Lutador {self.identificador}: {self.socos} socos, {self.coordenadas}, {self.box}"
-
-
-"""# Exemplo de uso:
-lutador1 = Lutador(1)
-lutador2 = Lutador(2)
-
-# Lutador 1 dá 3 socos
-for _ in range(3):
-    lutador1.dar_soco()
-
-# Lutador 2 dá 5 socos
-for _ in range(5):
-    lutador2.dar_soco()
-
-print(lutador1)  # Output: Lutador 1: 3 socos
-print(lutador2)  # Output: Lutador 2: 5 socos"""
