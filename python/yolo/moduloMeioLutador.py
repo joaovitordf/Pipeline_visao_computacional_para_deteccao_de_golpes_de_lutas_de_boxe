@@ -2,29 +2,11 @@ import numpy as np
 import cv2
 
 def draw_circle(image, center, radius, color=(0, 255, 0), thickness=2):
-    """
-    Desenha um círculo no ponto central dado.
-    :param image: Imagem onde o círculo será desenhado.
-    :param center: Centro do círculo (x, y).
-    :param radius: Raio do círculo.
-    :param color: Cor do círculo (B, G, R).
-    :param thickness: Espessura da borda. Use -1 para círculo sólido.
-    :return: Imagem com o círculo desenhado.
-    """
-    center = (int(center[0]), int(center[1]))  # Converte as coordenadas para inteiros
+    center = (int(center[0]), int(center[1]))
     cv2.circle(image, center, radius, color, thickness)
     return image
 
 def draw_line_between_centers(image, center1, center2, color=(0, 255, 0), thickness=2):
-    """
-    Desenha uma linha reta entre os pontos centrais de dois lutadores.
-    :param image: Imagem onde a linha será desenhada.
-    :param center1: Coordenadas (x, y) do centro do lutador 1.
-    :param center2: Coordenadas (x, y) do centro do lutador 2.
-    :param color: Cor da linha (B, G, R).
-    :param thickness: Espessura da linha.
-    :return: Imagem com a linha desenhada.
-    """
     # Converte as coordenadas dos centros para inteiros
     pt1 = (int(center1[0]), int(center1[1]))
     pt2 = (int(center2[0]), int(center2[1]))
@@ -34,17 +16,9 @@ def draw_line_between_centers(image, center1, center2, color=(0, 255, 0), thickn
     return image
 
 def calcular_distancia(center1, center2):
-    """
-    Calcula a distância euclidiana entre dois pontos centrais.
-    :param center1: Coordenadas (x, y) do primeiro ponto central.
-    :param center2: Coordenadas (x, y) do segundo ponto central.
-    :return: Distância entre os dois pontos.
-    """
-    # Converte os pontos para arrays NumPy para facilitar o cálculo
     ponto1 = np.array(center1)
     ponto2 = np.array(center2)
 
-    # Calcula a distância euclidiana
     distancia = np.linalg.norm(ponto1 - ponto2)
     return distancia
 
@@ -74,6 +48,33 @@ def moduloMeioLutadores(frame, results, cores, lutador1, lutador2, frame_lutador
 
     lutador1.distancia = distancia
     lutador2.distancia = distancia
+
+    # Calcula ponto médio da linha
+    mid_x = int((center1[0] + center2[0]) / 2)
+    mid_y = int((center1[1] + center2[1]) / 2)
+
+    # Formata o texto da distância (por ex. "123.4")
+    texto = f"{distancia:.1f}"
+
+    # Desenha o texto no ponto médio
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.7
+    thickness = 2
+    text_size, _ = cv2.getTextSize(texto, font, font_scale, thickness)
+
+    # Ajusta para centralizar o texto no ponto médio
+    text_w, text_h = text_size
+    text_org = (mid_x - text_w // 2, mid_y - text_h // 2)
+
+    # Cor de fundo para legibilidade (opcional)
+    cv2.rectangle(frame,
+                  (text_org[0] - 2, text_org[1] + 2),
+                  (text_org[0] + text_w + 2, text_org[1] - text_h - 2),
+                  (0, 0, 0),
+                  thickness=cv2.FILLED)
+
+    # Finalmente desenha o texto em branco
+    cv2.putText(frame, texto, text_org, font, font_scale, (255, 255, 255), thickness, cv2.LINE_AA)
 
     frame_lutador[frame_count].update({'lutador_1': lutador1})
     frame_lutador[frame_count].update({'lutador_2': lutador2})

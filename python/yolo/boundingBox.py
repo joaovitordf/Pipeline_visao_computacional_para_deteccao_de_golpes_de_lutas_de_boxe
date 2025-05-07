@@ -42,16 +42,18 @@ def pernaCoordenadas(imagem, keypoints):
     return [coordenada_start_x, coordenada_end_x, coordenada_start_y, coordenada_end_y]
 
 
-def define_lutador(lutador1, lutador2, cor, tolerancia=50):
-    lut1 = np.abs(cor - lutador1.cor)
-    lut2 = np.abs(cor - lutador2.cor)
+def define_lutador(lutador1, lutador2, cor, tolerancia=90):
+    cor = np.array(cor, dtype=float)
+    c1 = np.array(lutador1.cor, dtype=float)
+    c2 = np.array(lutador2.cor, dtype=float)
 
-    media_lut1 = (lut1[0] + lut1[1] + lut1[2]) / 3
-    media_lut2 = (lut2[0] + lut2[1] + lut2[2]) / 3
+    # calcula distância euclidiana
+    dist1 = np.linalg.norm(cor - c1)
+    dist2 = np.linalg.norm(cor - c2)
 
-    if media_lut1 <= tolerancia:
+    if dist1 <= tolerancia:
         return 1
-    elif media_lut2 <= tolerancia:
+    elif dist2 <= tolerancia:
         return 2
     else:
         return None

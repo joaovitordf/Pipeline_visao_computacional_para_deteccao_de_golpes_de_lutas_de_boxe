@@ -2,92 +2,65 @@ import cv2
 from sklearn.cluster import KMeans
 import numpy as np
 import matplotlib.pyplot as plt
-
+from mpl_toolkits.mplot3d import Axes3D
 
 # FONTE: https://medium.com/buzzrobot/dominant-colors-in-an-image-using-k-means-clustering-3c7af4622036
 
 class DominantColors:
-    CLUSTERS = None
-    IMAGE = None
-    COLORS = None
-    LABELS = None
-
-    def __init__(self, image, clusters=3):
+    def __init__(self, image, clusters=3, tolerancia=90):
         self.CLUSTERS = clusters
-        self.IMAGE = image
+        self.IMAGE = image  # Expect RGB image
+        self.COLORS = None
+        self.LABELS = None
+        self.tolerancia = tolerancia
 
     def dominantColors(self):
-        #read image
-        img = self.IMAGE
+        # reshape to list of pixels
+        pixels = self.IMAGE.reshape(-1, 3)
+        self.IMAGE = pixels
 
-        #reshaping to a list of pixels
-        img = img.reshape((img.shape[0] * img.shape[1], 3))
-
-        #save image after operations
-        self.IMAGE = img
-
-        #using k-means to cluster pixels
+        # run k-means
         kmeans = KMeans(n_clusters=self.CLUSTERS)
-        kmeans.fit(img)
-
-        #the cluster centers are our dominant colors.
-        self.COLORS = kmeans.cluster_centers_
-
-        #save labels
+        kmeans.fit(pixels)
+        self.COLORS = kmeans.cluster_centers_.astype(int)
         self.LABELS = kmeans.labels_
+        return self.COLORS
 
-        """# Criar uma imagem em branco para exibir as cores
-        color_display = np.zeros((100, len(self.COLORS) * 100, 3), dtype=np.uint8)
+    """def rgb_to_hex(self, rgb):
+        return '#%02x%02x%02x' % tuple(rgb)
 
-        # Preencher a imagem com as cores dominantes
-        for i, color in enumerate(self.COLORS):
-            color_display[:, i * 100:(i + 1) * 100] = color
+    def plotClusters(self):
+        colors_hex = [self.rgb_to_hex(c) for c in self.COLORS]
 
-        cv2.imshow("cores dominantes", color_display)
-        cv2.waitKey(0)"""
-        #returning after converting to integer from float
-        return self.COLORS.astype(int)
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
 
-    """def plotHistogram(self):
-       
-        #labels form 0 to no. of clusters
-        numLabels = np.arange(0, self.CLUSTERS+1)
-       
-        #create frequency count tables    
-        (hist, _) = np.histogram(self.LABELS, bins = numLabels)
-        hist = hist.astype("float")
-        hist /= hist.sum()
-        
-        #appending frequencies to cluster centers
-        colors = self.COLORS
-        
-        #descending order sorting as per frequency count
-        colors = colors[(-hist).argsort()]
-        hist = hist[(-hist).argsort()] 
-        
-        #creating empty chart
-        chart = np.zeros((50, 500, 3), np.uint8)
-        start = 0
-        
-        #creating color rectangles
-        for i in range(self.CLUSTERS):
-            end = start + hist[i] * 500
-            
-            #getting rgb values
-            r = colors[i][0]
-            g = colors[i][1]
-            b = colors[i][2]
-            
-            #using cv2.rectangle to plot colors
-            cv2.rectangle(chart, (int(start), 0), (int(end), 50), (r,g,b), -1)
-            start = end	
-        
-        #display chart
-        plt.figure()
-        plt.axis("off")
-        plt.imshow(chart)
-        plt.show()"""
+        ax.scatter(
+            self.COLORS[:, 0], self.COLORS[:, 1], self.COLORS[:, 2],
+            c=colors_hex,
+            s=200,
+            marker='o',
+            edgecolors='k'
+        )
 
+        # desenhar esfera de tolerância ao redor de cada cor dominante
+        u, v = np.mgrid[0:2*np.pi:20j, 0:np.pi:10j]
+        for center in self.COLORS:
+            x = self.tolerancia * np.cos(u) * np.sin(v) + center[0]
+            y = self.tolerancia * np.sin(u) * np.sin(v) + center[1]
+            z = self.tolerancia * np.cos(v) + center[2]
+            ax.plot_wireframe(x, y, z, color='black', alpha=0.3)
+
+        # Forçar os eixos para o range RGB
+        ax.set_xlim(0, 255)
+        ax.set_ylim(0, 255)
+        ax.set_zlim(0, 255)
+
+        ax.set_xlabel('R')
+        ax.set_ylabel('G')
+        ax.set_zlabel('B')
+        plt.tight_layout()
+        plt.show(block=True)"""
 
 def roi_tronco(imagem, keypoints):
     x1 = int(keypoints[6][0] * imagem.shape[1])
@@ -163,7 +136,8 @@ def clusterizaFunction(imagem, results, lutador1, lutador2, frame_lutador, frame
             #draw_boundingBox(imagem, keypoints_numpy)
             # Obtém o recorte da imagem com base nos keypoints
             recorte = pernaCoordenadas(imagem, keypoints_numpy)
-
+            #cv2.imshow("recorte", recorte)
+            #cv2.waitKey(0)
             if recorte.size == 0:
                 #print("Recorte vazio, pulando processamento.")
                 continue

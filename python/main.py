@@ -11,6 +11,7 @@ from yolo.identificaColisao import automatoColisao
 from yolo.boundingBox import boundingBox
 from yolo.clusteriza import clusterizaFunction
 from lutador import Lutador
+from clusteriza import DominantColors
 
 global_context = None
 
@@ -165,26 +166,26 @@ def extrai_canal_blue(image):
 
 def main_image():
     context = create_context()
-    image_path = utils.retorna_diretorio("videos/cubo.jpeg")
+    image_path = utils.retorna_diretorio("videos/extracao3.png")
     frame = cv2.imread(image_path)
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     if frame is None or frame.size == 0:
         print("Imagem não encontrada ou inválida.")
         return
 
-    red_channel_image = extrai_canal_blue(frame)
+    blue_channel = extrai_canal_blue(frame)
 
-    download_filename = "processed_image_blue.png"
-    if cv2.imwrite(download_filename, red_channel_image):
-        print(f"A imagem processada (canal Red) foi salva para download como: {download_filename}")
-    else:
-        print("Erro ao salvar a imagem.")
+    dc = DominantColors(rgb, clusters=1)
+    cores = dc.dominantColors()   # preenche dc.COLORS e dc.LABELS
+
+    dc.plotClusters()
 
 
 # ------------------ Modo Vídeo ------------------
 
 def main_video():
     context = create_context()
-    video_source = utils.retorna_diretorio("videos/videocompletocorte.mp4")
+    video_source = utils.retorna_diretorio("videos/vid1.mp4")
     cap = cv2.VideoCapture(video_source)
 
     frame_count_local = 0

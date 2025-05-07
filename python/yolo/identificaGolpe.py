@@ -2,20 +2,6 @@ import math
 import numpy as np
 
 
-def define_lutador(lutador1, lutador2, cor, tolerancia=50):
-    lut1 = np.abs(cor - lutador1.cor)
-    lut2 = np.abs(cor - lutador2.cor)
-
-    media_lut1 = (lut1[0] + lut1[1] + lut1[2]) / 3
-    media_lut2 = (lut2[0] + lut2[1] + lut2[2]) / 3
-
-    if media_lut1 <= tolerancia:
-        return 1
-    elif media_lut2 <= tolerancia:
-        return 2
-    else:
-        return None
-
 def golpe(keypoints, results, frame, coordenada_corte, lutador1, lutador2):
     info_pessoa = dict()
     boxes = results.boxes
