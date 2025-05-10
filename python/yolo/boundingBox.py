@@ -7,11 +7,20 @@ from yolo.clusteriza import DominantColors, clusterizaFunction
 from yolo.identificaColisao import colisao
 from yolo.identificaGolpe import golpe
 
-from yolo.roiParts import roi_linha_cintura, roi_mao_esquerda, roi_mao_direita, roi_tronco
-
 from python.yolo.moduloDefineCoordenadas import *
-from python.yolo.roiParts import roi_cabeca
 
+from ultralytics.utils.plotting import Annotator
+from python.yolo.roiParts import roi_cabeca, roi_tronco, roi_linha_cintura, roi_mao_esquerda, roi_mao_direita
+
+CLASS_LABELS = {0: 'vermelho', 1: 'azul'}
+CLASS_COLORS = {0: (0, 0, 255), 1: (255, 0, 0)}
+
+SKELETON = [
+    (0, 1), (1, 3), (0, 2), (2, 4),
+    (5, 6), (5, 7), (7, 9), (6, 8), (8, 10),
+    (5, 11), (6, 12),
+    (11, 12), (11, 13), (13, 15), (12, 14), (14, 16)
+]
 
 def pernaCoordenadas(imagem, keypoints):
     x1 = int(keypoints[12][0] * imagem.shape[1])
@@ -217,28 +226,6 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
 
             contador += 1
 
-        #verifica_colisao(keypoints, r, frame, areaLutador, coordenada_corte, lutador1, lutador2)
-        """cab = cabeca(frame, results)
-        for c in cab:
-            (start, end) = c
-            annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
-        tronco = roi_tronco(frame, results)
-        for tron in tronco:
-            (start, end) = tron
-            annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
-
-        linhasCinturas = roi_linha_cintura(frame, results)
-        for linha in linhasCinturas:
-            (start, end) = linha
-            annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 10)
-        roi_mao_esquerda = roi_mao_esquerda(frame, results)
-        for maoEsq in roi_mao_esquerda:
-            (start, end) = maoEsq
-            annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)
-        roi_mao_direita = roi_mao_direita(frame, results)
-        for maoDir in roi_mao_direita:
-            (start, end) = maoDir
-            annotator.im = cv2.rectangle(annotator.im, start, end, (0, 0, 255), 5)"""
         return annotator
 
 
@@ -253,3 +240,77 @@ def verifica_colisao(keypoints, r, frame, areaLutador, coordenada_corte, lutador
     else:
         #print("Sem colisao.")
         pass
+
+
+def boundingBoxOtimizado(frame, results, lutador1, lutador2, frame_lutador, frame_count):
+    annotated = frame.copy()
+    annotator = Annotator(annotated)
+    frame_lutador.setdefault(frame_count, {})
+    h, w = frame.shape[:2]
+
+    for r in results:
+        boxes = r.boxes
+        kps = r.keypoints.xyn.cpu().numpy() if hasattr(r.keypoints, 'xyn') else None
+
+        for i, box in enumerate(boxes):
+            cls_idx = int(box.cls[0])
+            base_label = CLASS_LABELS.get(cls_idx, 'desconhecido')
+            color = CLASS_COLORS.get(cls_idx, (0,255,0))
+
+            # decide qual lutador e pega contagem de socos
+            if cls_idx == 0:
+                lut = lutador1
+            else:
+                lut = lutador2
+            count = getattr(lut, 'socos', 0)
+
+            # monta label com contagem
+            label_text = f"{base_label} ({count})"
+
+            # desenha bbox + label
+            xyxy = list(map(int, box.xyxy[0].tolist()))
+            annotator.box_label(xyxy, label_text, color=color)
+
+            # atualiza lutador e frame_lutador
+            lut.identificador = 1 if cls_idx == 0 else 2
+            lut.box = xyxy
+            frame_lutador[frame_count][f'lutador_{lut.identificador}'] = lut
+
+            # se houver pose, desenha pontos, esqueleto e ROIs...
+            if kps is not None and i < len(kps):
+                person_kp = kps[i]
+                pts = []
+                # filtra e marca keypoints inválidos como None
+                for x_rel, y_rel in person_kp:
+                    if x_rel == 0 and y_rel == 0:
+                        pts.append(None)
+                    else:
+                        x, y = int(x_rel * w), int(y_rel * h)
+                        pts.append((x, y))
+                        cv2.circle(annotator.im, (x, y), 3, color, -1)
+
+                # desenha somente as arestas cujo par de pontos existam
+                for a, b in SKELETON:
+                    pa, pb = pts[a], pts[b]
+                    if pa is not None and pb is not None:
+                        cv2.line(annotator.im, pa, pb, color, 2)
+
+                # ROIs
+                head       = roi_cabeca(frame, person_kp)
+                trunk      = roi_tronco(frame, person_kp)
+                waist      = roi_linha_cintura(frame, person_kp)
+                left_hand  = roi_mao_esquerda(frame, person_kp)
+                right_hand = roi_mao_direita(frame, person_kp)
+                for roi in [head, trunk, waist, left_hand, right_hand]:
+                    if roi is not None:
+                        start, end = roi
+                        cv2.rectangle(annotator.im, start, end, color, 2)
+
+                # atualiza atributos de ROI no objeto lutador
+                lut.roi_cabeca         = head
+                lut.roi_tronco         = trunk
+                lut.roi_linha_cintura  = waist
+                lut.roi_mao_esquerda   = left_hand
+                lut.roi_mao_direita    = right_hand
+
+    return annotator

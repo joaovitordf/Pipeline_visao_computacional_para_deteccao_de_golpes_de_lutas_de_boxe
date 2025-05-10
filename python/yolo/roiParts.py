@@ -1,20 +1,16 @@
 from python.yolo.moduloDefineCoordenadas import nose_coordenadas
 
 # Fatores dinâmicos para definição dos ROIs
-HEAD_ROI_FACTOR = 0.025          # 2,5% da dimensão para a cabeça
-HAND_ROI_WIDTH_FACTOR = 0.04      # 4% da largura para as mãos
-HAND_ROI_HEIGHT_FACTOR = 0.03     # 3% da altura para as mãos
-WAIST_ROI_WIDTH_FACTOR = 0.04     # 4% da largura para ampliar a região da cintura
+HEAD_ROI_FACTOR = 0.02          # 2% da dimensão para a cabeça
+HAND_ROI_WIDTH_FACTOR = 0.03      # 3% da largura para as mãos
+HAND_ROI_HEIGHT_FACTOR = 0.02     # 2% da altura para as mãos
+WAIST_ROI_WIDTH_FACTOR = 0.03     # 3% da largura para ampliar a região da cintura
 MIN_TRUNK_WIDTH_FACTOR = 0.02     # Largura mínima do tronco em relação à largura da imagem
 
 # Multiplicador para imagens em modo retrato (altura > largura)
 PORTRAIT_WIDTH_MULTIPLIER = 1.2
 
 def adjust_width_factor(imagem, factor):
-    """
-    Ajusta apenas o fator de largura para o ROI.
-    Se a imagem estiver em modo retrato (altura > largura), multiplica o fator pelo multiplicador.
-    """
     if imagem.shape[0] > imagem.shape[1]:
         return factor * PORTRAIT_WIDTH_MULTIPLIER
     return factor
