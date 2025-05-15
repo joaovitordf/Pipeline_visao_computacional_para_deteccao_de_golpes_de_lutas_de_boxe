@@ -1,16 +1,7 @@
 import cv2
-import os
-
 from ultralytics import YOLO
 import numpy as np
 
-import matplotlib.pyplot as plt
-import numpy as np
-
-from skimage.io import imread, imshow
-from skimage.color import rgb2hsv
-from skimage.exposure import histogram, cumulative_distribution
-from skimage.filters import threshold_otsu
 
 from python.yolo.moduloMeioLutador import moduloMeioLutadores, moduloMeioLutadoresOtimizado, calcular_distancia
 
@@ -43,36 +34,31 @@ def colisao(roi1, roi2, distancia_max_ponto=20.0):
     result = dist <= distancia_max_ponto
     return result
 
-def segmentar_imagem(imagem, conf):
-    # Cria uma máscara preta com o mesmo tamanho da imagem
-    background = np.zeros_like(imagem)
 
-    # Realiza as previsões de segmentação
-    results = model.predict(imagem, conf=conf, verbose=True, device="cuda")
+def verificaGolpeIrregular(roi_golpe, roi_linha_cintura):
+    if roi_golpe is None or roi_linha_cintura is None:
+        return False
 
-    # Preenche os objetos detectados com a cor branca
-    white_color = (255, 255, 255)
-    for result in results:
-        for mask in result.masks.xy:
-            points = np.int32([mask])
-            cv2.fillPoly(background, points, white_color)
+    # Coordenadas do golpe
+    x1, y1, x2, y2 = roi_golpe
 
-    return background
+    # Coordenadas da região da linha de cintura
+    (x_left, y_top), (x_right, y_bottom) = roi_linha_cintura
+
+    # Verifica se há interseção entre os dois retângulos
+    horizontal_overlap = not (x2 < x_left or x1 > x_right)
+    vertical_overlap   = not (y2 < y_top  or y1 > y_bottom)
+
+    return horizontal_overlap and vertical_overlap
+
 
 def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count, frame_original):
-
-    # Atravessou roi da cabeca ou corpo
-
-    # Recebe as coordenadas se forem validas continua na funcao
     frame = moduloMeioLutadores(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
-
-    #keypoints = results[0].keypoints
 
     if lutador1.distancia is not None and lutador1.distancia:
 
         # ----------------------------- Possivel ataque do lutador 1 -----------------------------
-        r1 = None
-        r2 = None
+        r1 = r2 = None
 
         # Golpe de mao esquerda do lutador 1 no lutador 2
         if lutador1.roi_mao_esquerda is not None:
@@ -87,28 +73,11 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
             if colisao(r1, r2):
                 lutador1.roi_mao_esquerdaCabeca = True
 
-                x1, y1, x2, y2 = map(int, r1)
-                recorte = frame_original[y1:y2, x1:x2]
-
-                """recorte_segmentado = segmentar_imagem(recorte, conf=0.2)
-
-                altura = max(recorte.shape[0], recorte_segmentado.shape[0])
-                largura = max(recorte.shape[1], recorte_segmentado.shape[1])
-
-                recorte_redimensionado = cv2.resize(recorte, (largura, altura))
-                recorte_segmentado_redimensionado = cv2.resize(recorte_segmentado, (largura, altura))
-
-                imagem_combinada = np.vstack((recorte_redimensionado, recorte_segmentado_redimensionado))
-
-                cv2.imshow("Recorte e Recorte Segmentado", imagem_combinada)
-                cv2.waitKey(0)"""
-
             if not colisao(r1, r2) and lutador1.roi_mao_esquerdaCabeca:
                 lutador1.roi_mao_esquerdaCabeca = False
-                print(lutador1.distancia)
                 lutador1.soco()
 
-        r1 = None
+        r1 = r2 = None
 
         # Golpe de mao direita do lutador 1 no lutador 2
         if lutador1.roi_mao_direita is not None:
@@ -120,14 +89,12 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
                 lutador1.roi_mao_direitaCabeca = True
             if not colisao(r1, r2) and lutador1.roi_mao_direitaCabeca:
                 lutador1.roi_mao_direitaCabeca = False
-                print(lutador1.distancia)
                 lutador1.soco()
 
         # ----------------------------------------------------------------------------------------
 
         # ----------------------------- Possivel ataque do lutador 2 -----------------------------
-        r1 = None
-        r2 = None
+        r1 = r2 = None
 
         if lutador2.roi_mao_esquerda is not None:
             (x1, y1), (x2, y2) = lutador2.roi_mao_esquerda
@@ -142,10 +109,9 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
                 lutador2.roi_mao_esquerdaCabeca = True
             if not colisao(r1, r2) and lutador2.roi_mao_esquerdaCabeca:
                 lutador2.roi_mao_esquerdaCabeca = False
-                print(lutador1.distancia)
                 lutador2.soco()
 
-        r1 = None
+        r1 = r2 = None
 
         if lutador2.roi_mao_direita is not None:
             (x1, y1), (x2, y2) = lutador2.roi_mao_direita
@@ -160,17 +126,12 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
                 lutador2.roi_mao_direitaCabeca = True
             if not colisao(r1, r2) and lutador2.roi_mao_direitaCabeca:
                 lutador2.roi_mao_direitaCabeca = False
-                print(lutador1.distancia)
                 lutador2.soco()
-
-        r1 = None
-        r2 = None
 
         # ----------------------------------------------------------------------------------------
 
         # ----------------------------- Possível ataque no tronco -----------------------------
-        r1 = None
-        r2 = None
+        r1 = r2 = None
 
         # Golpe de mão esquerda do lutador 1 no tronco do lutador 2
         if lutador1.roi_mao_esquerda is not None:
@@ -182,15 +143,11 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
             r2 = x1, y1, x2, y2
 
         if r1 is not None and r2 is not None:
-            if colisao(r1, r2):
-                lutador1.roi_mao_esquerdaTronco = True
             if not colisao(r1, r2) and lutador1.roi_mao_esquerdaTronco:
                 lutador1.roi_mao_esquerdaTronco = False
-                print(lutador1.distancia)
                 lutador1.soco()
 
-        r1 = None
-        r2 = None
+        r1 = r2 = None
 
         # Golpe de mão direita do lutador 1 no tronco do lutador 2
         if lutador1.roi_mao_direita is not None:
@@ -204,13 +161,12 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
         if r1 is not None and r2 is not None:
             if colisao(r1, r2):
                 lutador1.roi_mao_direitaTronco = True
-            if not colisao(r1, r2) and lutador1.roi_mao_direitaTronco:
+            elif lutador1.roi_mao_direitaTronco:
+                # contato terminou
                 lutador1.roi_mao_direitaTronco = False
-                print(lutador1.distancia)
                 lutador1.soco()
 
-        r1 = None
-        r2 = None
+        r1 = r2 = None
 
         # Golpe de mão esquerda do lutador 2 no tronco do lutador 1
         if lutador2.roi_mao_esquerda is not None:
@@ -224,13 +180,12 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
         if r1 is not None and r2 is not None:
             if colisao(r1, r2):
                 lutador2.roi_mao_esquerdaTronco = True
-            if not colisao(r1, r2) and lutador2.roi_mao_esquerdaTronco:
+            elif lutador2.roi_mao_esquerdaTronco:
+                # contato terminou
                 lutador2.roi_mao_esquerdaTronco = False
-                print(lutador1.distancia)
                 lutador2.soco()
 
-        r1 = None
-        r2 = None
+        r1 = r2 = None
 
         # Golpe de mão direita do lutador 2 no tronco do lutador 1
         if lutador2.roi_mao_direita is not None:
@@ -244,10 +199,38 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
         if r1 is not None and r2 is not None:
             if colisao(r1, r2):
                 lutador2.roi_mao_direitaTronco = True
-            if not colisao(r1, r2) and lutador2.roi_mao_direitaTronco:
+            elif lutador2.roi_mao_direitaTronco:
+                # contato terminou
                 lutador2.roi_mao_direitaTronco = False
-                print(lutador1.distancia)
                 lutador2.soco()
+        # ----------------------------------------------------------------------------------------
+
+        # ----------------------------- Possível golpe irregular -----------------------------
+
+        checa_golpe_irregular(
+            lutador1, lutador2,
+            roi_mao_attr="roi_mao_direita",
+            roi_alvo_attr="roi_linha_cintura"
+        )
+
+        checa_golpe_irregular(
+            lutador1, lutador2,
+            roi_mao_attr="roi_mao_esquerda",
+            roi_alvo_attr="roi_linha_cintura"
+        )
+
+        checa_golpe_irregular(
+            lutador2, lutador1,
+            roi_mao_attr="roi_mao_direita",
+            roi_alvo_attr="roi_linha_cintura"
+        )
+
+        checa_golpe_irregular(
+            lutador2, lutador1,
+            roi_mao_attr="roi_mao_esquerda",
+            roi_alvo_attr="roi_linha_cintura"
+        )
+
         # ----------------------------------------------------------------------------------------
 
         frame_lutador[frame_count].update({'lutador_1': lutador1})
@@ -256,34 +239,83 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
     return frame
 
 
+def checa_golpe_irregular(atacante, defensor, roi_mao_attr, roi_alvo_attr):
+    roi_mao = getattr(atacante, roi_mao_attr, None)
+    roi_alvo = getattr(defensor, roi_alvo_attr, None)
+    if roi_mao is None or roi_alvo is None:
+        return
+
+    (ax1, ay1), (ax2, ay2) = roi_mao
+    (dx1, dy1), (dx2, dy2) = roi_alvo
+    r_atk = (ax1, ay1, ax2, ay2)
+    r_def = (dx1, dy1, dx2, dy2)
+
+    # colisão detectada
+    if colisao(r_atk, r_def):
+        # -- esquerda --
+        if roi_mao_attr == 'roi_mao_esquerda':
+            if not getattr(atacante, 'golpe_irregularEsquerda', False):
+                atacante.golpe_irregularEsquerda = True
+                print(f"Golpe irregular de lutador {atacante.identificador}! (esquerda)")
+                atacante.falta()
+
+        # -- direita --
+        elif roi_mao_attr == 'roi_mao_direita':
+            if not getattr(atacante, 'golpe_irregularDireita', False):
+                atacante.golpe_irregularDireita = True
+                print(f"Golpe irregular de lutador {atacante.identificador}! (direita)")
+                atacante.falta()
+
+    else:
+        # quando termina o contato, limpamos as flags
+        if roi_mao_attr == 'roi_mao_esquerda' and getattr(atacante, 'golpe_irregularEsquerda', False):
+            atacante.golpe_irregularEsquerda = False
+
+        elif roi_mao_attr == 'roi_mao_direita' and getattr(atacante, 'golpe_irregularDireita', False):
+            atacante.golpe_irregularDireita = False
+
+
 def automatoColisaoOtimizado(frame, results, lutador1, lutador2, frame_lutador, frame_count, frame_original=None):
     frame = moduloMeioLutadoresOtimizado(frame, results, lutador1, lutador2, frame_lutador, frame_count)
 
     ataques = [
-        (lutador1, 'roi_mao_esquerda', lutador2, 'roi_cabeca', 'esquerda_cabeca', lutador1.soco),
-        (lutador1, 'roi_mao_direita', lutador2, 'roi_cabeca', 'direita_cabeca', lutador1.soco),
-        (lutador1, 'roi_mao_esquerda', lutador2, 'roi_tronco', 'esquerda_tronco', lutador1.soco),
-        (lutador1, 'roi_mao_direita', lutador2, 'roi_tronco', 'direita_tronco', lutador1.soco),
-        (lutador2, 'roi_mao_esquerda', lutador1, 'roi_cabeca', 'esquerda_cabeca', lutador2.soco),
-        (lutador2, 'roi_mao_direita', lutador1, 'roi_cabeca', 'direita_cabeca', lutador2.soco),
-        (lutador2, 'roi_mao_esquerda', lutador1, 'roi_tronco', 'esquerda_tronco', lutador2.soco),
-        (lutador2, 'roi_mao_direita', lutador1, 'roi_tronco', 'direita_tronco', lutador2.soco),
+        (lutador1, 'roi_mao_esquerda', lutador2, 'roi_cabeca', 'esquerda_cabeca'),
+        (lutador1, 'roi_mao_direita',  lutador2, 'roi_cabeca', 'direita_cabeca'),
+        (lutador1, 'roi_mao_esquerda', lutador2, 'roi_tronco','esquerda_tronco'),
+        (lutador1, 'roi_mao_direita',  lutador2, 'roi_tronco','direita_tronco'),
+        (lutador2, 'roi_mao_esquerda', lutador1, 'roi_cabeca', 'esquerda_cabeca'),
+        (lutador2, 'roi_mao_direita',  lutador1, 'roi_cabeca', 'direita_cabeca'),
+        (lutador2, 'roi_mao_esquerda', lutador1, 'roi_tronco','esquerda_tronco'),
+        (lutador2, 'roi_mao_direita',  lutador1, 'roi_tronco','direita_tronco'),
     ]
 
-    for atacante, mao_attr, defensor, parte_attr, flag_suffix, metodo_soco in ataques:
+    for atacante, mao_attr, defensor, parte_attr, flag_suffix in ataques:
         r1 = getattr(atacante, mao_attr, None)
         r2 = getattr(defensor, parte_attr, None)
-        if r1 is None or r2 is None:
+        if not (r1 and r2):
             continue
 
         flag_name = f"{mao_attr}_{flag_suffix}"
         prev_flag = getattr(atacante, flag_name, False)
 
         if colisao(r1, r2):
+            # contato continua
             setattr(atacante, flag_name, True)
-        else:
-            if prev_flag:
-                metodo_soco()
+        elif prev_flag:
+            # contato terminou: decide soco
+            atacante.soco()
             setattr(atacante, flag_name, False)
+
+    # ----------------------------- Golpe irregular abaixo da cintura -----------------------------
+    checa_golpe_irregular(lutador1, lutador2, 'roi_mao_esquerda', 'roi_linha_cintura')
+    checa_golpe_irregular(lutador1, lutador2, 'roi_mao_direita',  'roi_linha_cintura')
+
+    checa_golpe_irregular(lutador2, lutador1, 'roi_mao_esquerda', 'roi_linha_cintura')
+    checa_golpe_irregular(lutador2, lutador1, 'roi_mao_direita',  'roi_linha_cintura')
+    # ---------------------------------------------------------------------------------------------
+
+    # atualiza histórico de quadros
+    frame_lutador[frame_count]['lutador_1'] = lutador1
+    frame_lutador[frame_count]['lutador_2'] = lutador2
 
     return frame

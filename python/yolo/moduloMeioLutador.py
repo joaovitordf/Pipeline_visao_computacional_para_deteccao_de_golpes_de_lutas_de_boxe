@@ -25,10 +25,6 @@ def calcular_distancia(center1, center2):
     return float(np.linalg.norm(np.array(center1) - np.array(center2)))
 
 def colisao(roi1, roi2, distancia_max_ponto=20.0):
-    """
-    Se roi for bbox (x1,y1,x2,y2), faz interseção de retângulos.
-    Se for ponto (x, y), considera colisão por proximidade.
-    """
     if roi1 is None or roi2 is None:
         return False
 

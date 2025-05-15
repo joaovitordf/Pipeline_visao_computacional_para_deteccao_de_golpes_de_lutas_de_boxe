@@ -1,5 +1,5 @@
 class Lutador:
-    def __init__(self, identificador, cor, socos=0, coordenadas=None, box=None, roi_cabeca=None, roi_tronco=None,
+    def __init__(self, identificador, cor, socos=0, irregular=0, coordenadas=None, box=None, roi_cabeca=None, roi_tronco=None,
                  roi_linha_cintura=None, roi_mao_esquerda=None, roi_mao_direita=None, nose=None, left_eye=None,
                  right_eye=None, left_ear=None, right_ear=None, left_shoulder=None, right_shoulder=None,
                  left_elbow=None, right_elbow=None, left_wrist=None, right_wrist=None, left_hip=None,
@@ -14,9 +14,13 @@ class Lutador:
         # 'socos' guarda o número de socos de cada lutador.
         self.socos = socos
 
+        self.irregular = irregular
+
         self.coordenadas = coordenadas
 
         self.box = box
+
+        # COORDENADAS DE ROIS DO LUTADOR
 
         self.roi_cabeca = roi_cabeca
         self.roi_tronco = roi_tronco
@@ -24,11 +28,16 @@ class Lutador:
         self.roi_mao_esquerda = roi_mao_esquerda
         self.roi_mao_direita = roi_mao_direita
 
+        # VALORES BOOLEANOS DE VERIFICACAO DE GOLPE
+
         self.roi_mao_direitaCabeca = False
         self.roi_mao_esquerdaCabeca = False
 
         self.roi_mao_direitaTronco = False
         self.roi_mao_esquerdaTronco = False
+
+        self.golpe_irregularEsquerda = False
+        self.golpe_irregularDireita = False
 
         self.distancia = distancia
 
@@ -54,7 +63,9 @@ class Lutador:
 
     def soco(self):
         self.socos += 1
-        print("Lutador: ", self.identificador, "Socos: ", self.socos)
+
+    def falta(self):
+        self.irregular += 1
 
     def __str__(self):
         return f"Lutador {self.identificador}: {self.socos} socos, {self.coordenadas}, {self.box}"

@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 # FONTE: https://medium.com/buzzrobot/dominant-colors-in-an-image-using-k-means-clustering-3c7af4622036
 
 class DominantColors:
-    def __init__(self, image, clusters=3, tolerancia=90):
+    def __init__(self, image, clusters=3, tolerancia=100):
         self.CLUSTERS = clusters
         self.IMAGE = image  # Expect RGB image
         self.COLORS = None

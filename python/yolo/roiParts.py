@@ -54,11 +54,11 @@ def roi_mao_direita(imagem, keypoints_numpy):
     return None
 
 def roi_linha_cintura(imagem, keypoints_numpy):
-    # left-hip: índice 11 e right-hip: índice 12
+    # vai da cintura esquerda ate o pe direito
     x1 = int(keypoints_numpy[11][0] * imagem.shape[1])
     y1 = int(keypoints_numpy[11][1] * imagem.shape[0])
-    x2 = int(keypoints_numpy[12][0] * imagem.shape[1])
-    y2 = int(keypoints_numpy[12][1] * imagem.shape[0])
+    x2 = int(keypoints_numpy[16][0] * imagem.shape[1])
+    y2 = int(keypoints_numpy[16][1] * imagem.shape[0])
     if (x1, y1) != (0, 0) and (x2, y2) != (0, 0):
         adjusted_waist_factor = adjust_width_factor(imagem, WAIST_ROI_WIDTH_FACTOR)
         offset = int(imagem.shape[1] * adjusted_waist_factor)

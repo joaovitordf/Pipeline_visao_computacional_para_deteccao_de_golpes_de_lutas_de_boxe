@@ -25,14 +25,14 @@ def create_context(otimizado):
     if otimizado == 0:
         model_path = utils.retorna_diretorio("pesos/yolov8m-pose.pt")
         model = YOLO(model_path)
-        lutador1 = Lutador(1, None, 0, None, None)
-        lutador2 = Lutador(2, None, 0, None, None)
+        lutador1 = Lutador(1, None, 0, 0, None, None)
+        lutador2 = Lutador(2, None, 0, 0, None, None)
         frame_lutador = {}
     else:
         model_path = r"C:\Users\xjoao\PycharmProjects\TCC\python\runs\pose\train13\weights\best.pt"
         model = YOLO(model_path)
-        lutador1 = Lutador(1, None, 0, None, None)
-        lutador2 = Lutador(2, None, 0, None, None)
+        lutador1 = Lutador(1, None, 0, 0, None, None)
+        lutador2 = Lutador(2, None, 0, 0, None, None)
         frame_lutador = {}
     return {'model': model, 'lutador1': lutador1, 'lutador2': lutador2, 'frame_lutador': frame_lutador}
 

@@ -5,7 +5,6 @@ from ultralytics.utils.plotting import Annotator
 import numpy as np
 from yolo.clusteriza import DominantColors, clusterizaFunction
 from yolo.identificaColisao import colisao
-from yolo.identificaGolpe import golpe
 
 from python.yolo.moduloDefineCoordenadas import *
 
@@ -51,7 +50,7 @@ def pernaCoordenadas(imagem, keypoints):
     return [coordenada_start_x, coordenada_end_x, coordenada_start_y, coordenada_end_y]
 
 
-def define_lutador(lutador1, lutador2, cor, tolerancia=90):
+def define_lutador(lutador1, lutador2, cor, tolerancia=110):
     cor = np.array(cor, dtype=float)
     c1 = np.array(lutador1.cor, dtype=float)
     c2 = np.array(lutador2.cor, dtype=float)
@@ -69,6 +68,9 @@ def define_lutador(lutador1, lutador2, cor, tolerancia=90):
 
 
 def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count):
+    # Garante que exista um dicionário para este frame
+    frame_lutador.setdefault(frame_count, {})
+
     if lutador1.cor is None and lutador2.cor is None and len(cores) == 2:
         lutador1.cor = cores[0]
         lutador2.cor = cores[1]
@@ -83,6 +85,9 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
         recorte = frame[coord[2]: coord[3], coord[0]:coord[1]]
         teste = DominantColors(recorte, 1)
         cor = teste.dominantColors()
+        if cor.size == 0:
+            #print(f"[boundingBox] recorte vazio em pessoa, pulando define_lutador.")
+            continue
         identifica_lutador = define_lutador(lutador1, lutador2, cor[0])
         if identifica_lutador == 1:
             lutador1.identificador = 1
@@ -167,7 +172,9 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
             recorte = frame[coord[2]: coord[3], coord[0]:coord[1]]
             teste = DominantColors(recorte, 1)
             cor = teste.dominantColors()
-
+            if cor.size == 0:
+                #print(f"[boundingBox] recorte vazio em pessoa, pulando define_lutador.")
+                continue
             identifica_lutador = define_lutador(lutador1, lutador2, cor[0])
             if identifica_lutador == 1:
                 lutador1.identificador = 1
@@ -185,61 +192,54 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
             areaLutador.append(box)
 
             if identifica_lutador == 1:
-                label_lutador = f"Lutador 1: {lutador1.socos}"
+                label_lutador = (
+                    f"Lutador 1: {lutador1.socos}|"
+                    f"{lutador1.irregular}"
+                )
             elif identifica_lutador == 2:
-                label_lutador = f"Lutador 2: {lutador2.socos}"
+                label_lutador = (
+                    f"Lutador 2: {lutador2.socos}|"
+                    f"{lutador2.irregular}"
+                )
             else:
                 label_lutador = "Lutador desconhecido"
             annotator.box_label(b, label_lutador, color=(0, 255, 0))
 
             if lutador1.roi_cabeca is not None:
                 start, end = lutador1.roi_cabeca
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
             if lutador1.roi_tronco is not None:
                 start, end = lutador1.roi_tronco
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
             if lutador1.roi_linha_cintura is not None:
                 start, end = lutador1.roi_linha_cintura
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
             if lutador1.roi_mao_esquerda is not None:
                 start, end = lutador1.roi_mao_esquerda
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
             if lutador1.roi_mao_direita is not None:
                 start, end = lutador1.roi_mao_direita
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
 
             if lutador2.roi_cabeca is not None:
                 start, end = lutador2.roi_cabeca
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
             if lutador2.roi_tronco is not None:
                 start, end = lutador2.roi_tronco
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
             if lutador2.roi_linha_cintura is not None:
                 start, end = lutador2.roi_linha_cintura
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
             if lutador2.roi_mao_esquerda is not None:
                 start, end = lutador2.roi_mao_esquerda
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
             if lutador2.roi_mao_direita is not None:
                 start, end = lutador2.roi_mao_direita
-                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 5)
+                annotator.im = cv2.rectangle(annotator.im, start, end, (255, 0, 0), 2)
 
             contador += 1
 
         return annotator
-
-
-def verifica_colisao(keypoints, r, frame, areaLutador, coordenada_corte, lutador1, lutador2):
-    # xyxy
-    retangulo1 = areaLutador[0]
-
-    retangulo2 = areaLutador[1]
-
-    if colisao(retangulo1, retangulo2):
-        golpe(keypoints, r, frame, coordenada_corte, lutador1, lutador2)
-    else:
-        #print("Sem colisao.")
-        pass
 
 
 def boundingBoxOtimizado(frame, results, lutador1, lutador2, frame_lutador, frame_count):
@@ -262,10 +262,15 @@ def boundingBoxOtimizado(frame, results, lutador1, lutador2, frame_lutador, fram
                 lut = lutador1
             else:
                 lut = lutador2
-            count = getattr(lut, 'socos', 0)
+            count_socos = getattr(lut, 'socos', 0)
+            count_irregulares = getattr(lut, 'irregular', 0)
 
             # monta label com contagem
-            label_text = f"{base_label} ({count})"
+            label_text = (
+                f"{base_label}("
+                f"{count_socos}|"
+                f"{count_irregulares})"
+            )
 
             # desenha bbox + label
             xyxy = list(map(int, box.xyxy[0].tolist()))
