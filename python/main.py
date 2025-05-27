@@ -1,5 +1,4 @@
 import asyncio
-import math
 
 import websockets
 import base64
@@ -29,7 +28,7 @@ def create_context(otimizado):
         lutador2 = Lutador(2, None, 0, 0, None, None)
         frame_lutador = {}
     else:
-        model_path = r"C:\Users\xjoao\PycharmProjects\TCC\python\runs\pose\train13\weights\best.pt"
+        model_path = r"C:\Users\xjoao\PycharmProjects\TCC\python\runs\pose\train16\weights\last.pt"
         model = YOLO(model_path)
         lutador1 = Lutador(1, None, 0, 0, None, None)
         lutador2 = Lutador(2, None, 0, 0, None, None)
@@ -236,11 +235,19 @@ def main_video(otimizado):
         context = create_context(0)
     else:
         context = create_context(1)
-    video_source = utils.retorna_diretorio("videos/fim2.mp4")
+
+    lutador1 = context["lutador1"]
+    lutador2 = context["lutador2"]
+
+    video_source = utils.retorna_diretorio("videos/fim1.mp4")
     cap = cv2.VideoCapture(video_source)
 
     tamanho_lista = 10
     fps_lista = deque(maxlen=tamanho_lista)
+
+    total_frames = 0
+    media_fps = 0.0
+    tempo_inicio_execucao = time.time()
 
     while cap.isOpened():
         start = time.time()
@@ -248,11 +255,12 @@ def main_video(otimizado):
         if not success:
             break
 
+        total_frames += 1
+
+        resize = cv2.resize(frame, (640, 640), interpolation=cv2.INTER_AREA)
         if otimizado == 0:
-            resize = cv2.resize(frame, (640, 640), interpolation=cv2.INTER_AREA)
             processed_frame = process_yolo(resize, 0, context)
         else:
-            resize = cv2.resize(frame, (640, 640), interpolation=cv2.INTER_AREA)
             processed_frame = process_yolo_otimizado(resize, 0, context)
 
         end = time.time()
@@ -267,37 +275,81 @@ def main_video(otimizado):
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
+    tempo_total_execucao = time.time() - tempo_inicio_execucao
+
     cap.release()
     cv2.destroyAllWindows()
+
+    # monta json com estatísticas
+    dados = {
+        "total_frames": total_frames,
+        "media_fps": round(media_fps, 2),
+        "golpes": {
+            "lutador_1": lutador1.socos,
+            "lutador_2": lutador2.socos
+        },
+        "golpes_irregulares": {
+            "lutador_1": lutador1.irregular,
+            "lutador_2": lutador2.irregular
+        },
+        "tempo_total_execucao_segundos": round(tempo_total_execucao, 2)
+    }
+
+    """with open("estatisticas_video_gpu.txt", "w") as f:
+        json.dump(dados, f, indent=4)"""
 
 
 # ------------------ Modo Servidor ------------------
 
 async def handler(websocket: WebSocketServerProtocol) -> None:
     frame_count = 0
+    fps_deque = deque(maxlen=10)
     async for message in websocket:
         try:
+            start_time = time.time()
+
             img_data = base64.b64decode(message)
             nparr = np.frombuffer(img_data, np.uint8)
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
             if frame is None:
                 print("Frame inválido recebido.")
-            else:
-                processed_frame = process_yolo(frame, frame_count, global_context)
-                print(f"Frame {frame_count} processado com sucesso.")
-                frame_count += 1
-                cv2.imshow("Frame Processado", cv2.resize(
-                    processed_frame,
-                    (int(processed_frame.shape[1]), int(processed_frame.shape[0]))
-                ))
-                cv2.waitKey(1)
+                continue
+
+            frame_resized = cv2.resize(frame, (640, 640), interpolation=cv2.INTER_AREA)
+
+            processed = process_yolo(frame_resized, frame_count, global_context)
+
+            elapsed = time.time() - start_time
+            fps = 1.0 / elapsed if elapsed > 0 else 0.0
+            fps_deque.append(fps)
+            avg_fps = sum(fps_deque) / len(fps_deque)
+
+            text = f"FPS: {avg_fps:.1f}"
+            cv2.putText(
+                processed, text,
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 255, 0),
+                2,
+                cv2.LINE_AA
+            )
+
+            cv2.imshow("Frame Processado", processed)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                await websocket.close()
+                break
+
+            frame_count += 1
+
         except Exception as e:
             print(f"Erro ao processar o frame: {e}")
 
 async def main_server():
     async with websockets.serve(handler, "0.0.0.0", 8765):
         print("Servidor WebSocket rodando na porta 8765")
-        await asyncio.Future()  # Mantém o servidor ativo indefinidamente
+        await asyncio.Future()
 
 
 # ------------------ Escolha do Modo ------------------

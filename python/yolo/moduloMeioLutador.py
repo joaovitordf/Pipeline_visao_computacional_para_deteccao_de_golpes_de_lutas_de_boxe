@@ -60,27 +60,14 @@ def moduloMeioLutadores(frame, results, cores, lutador1, lutador2, frame_lutador
     mid_x = int((center1[0] + center2[0]) / 2)
     mid_y = int((center1[1] + center2[1]) / 2)
 
-    # Formata o texto da distância (por ex. "123.4")
     texto = f"{distancia:.1f}"
-
-    # Desenha o texto no ponto médio
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 0.7
     thickness = 2
-    text_size, _ = cv2.getTextSize(texto, font, font_scale, thickness)
+    (text_w, text_h), baseline = cv2.getTextSize(texto, font, font_scale, thickness)
+    padding = 8
+    text_org = (mid_x - text_w // 2, mid_y + text_h + padding)
 
-    # Ajusta para centralizar o texto no ponto médio
-    text_w, text_h = text_size
-    text_org = (mid_x - text_w // 2, mid_y - text_h // 2)
-
-    # Cor de fundo para legibilidade (opcional)
-    cv2.rectangle(frame,
-                  (text_org[0] - 2, text_org[1] + 2),
-                  (text_org[0] + text_w + 2, text_org[1] - text_h - 2),
-                  (0, 0, 0),
-                  thickness=cv2.FILLED)
-
-    # Finalmente desenha o texto em branco
     cv2.putText(frame, texto, text_org, font, font_scale, (255, 255, 255), thickness, cv2.LINE_AA)
 
     frame_lutador[frame_count].update({'lutador_1': lutador1})

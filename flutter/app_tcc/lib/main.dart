@@ -27,8 +27,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController _ipController = TextEditingController(text: '192.168.1.100');
-  final TextEditingController _portController = TextEditingController(text: '8765');
+  final TextEditingController _ipController =
+  TextEditingController(text: '192.168.1.100');
+  final TextEditingController _portController =
+  TextEditingController(text: '8765');
 
   bool _connected = false;
 
@@ -36,6 +38,8 @@ class _HomePageState extends State<HomePage> {
   MediaStream? _localStream;
   WebSocket? _webSocket;
   GlobalKey _videoKey = GlobalKey();
+
+  double _pixelRatio = 1.0;
 
   @override
   void initState() {
@@ -62,10 +66,10 @@ class _HomePageState extends State<HomePage> {
       _webSocket = await WebSocket.connect('ws://$ip:$port');
       print('Conectado ao servidor via WebSocket.');
       _webSocket!.listen((data) {
-        print('Mensagem recebida: \$data');
+        print('Mensagem recebida: $data');
       });
     } catch (e) {
-      print('Erro ao conectar ao servidor via WebSocket: \$e');
+      print('Erro ao conectar ao servidor via WebSocket: $e');
       rethrow;
     }
   }
@@ -74,24 +78,20 @@ class _HomePageState extends State<HomePage> {
     final mediaConstraints = {
       'audio': false,
       'video': {
-        'mandatory': {
-          'minWidth': '1280',
-          'minHeight': '720',
-          'minFrameRate': '15',
-        },
         'facingMode': 'environment',
       },
     };
 
     try {
-      MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      MediaStream stream =
+      await navigator.mediaDevices.getUserMedia(mediaConstraints);
       setState(() {
         _localStream = stream;
         _localRenderer.srcObject = _localStream;
       });
       _startFrameCapture();
     } catch (e) {
-      print("Erro ao acessar a câmera: \$e");
+      print("Erro ao acessar a câmera: $e");
     }
   }
 
@@ -118,18 +118,19 @@ class _HomePageState extends State<HomePage> {
         RenderRepaintBoundary boundary =
         _videoKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
 
-        var image = await boundary.toImage(pixelRatio: 0.5);
-        ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+        // Usa o valor dinâmico de pixelRatio
+        var image = await boundary.toImage(pixelRatio: _pixelRatio);
+        ByteData? byteData =
+        await image.toByteData(format: ImageByteFormat.png);
 
         if (byteData != null) {
           Uint8List pngBytes = byteData.buffer.asUint8List();
           String base64Frame = base64Encode(pngBytes);
           _webSocket!.add(base64Frame);
-          print('Frame enviado via WebSocket.');
+          print('Frame enviado via WebSocket. pixelRatio=$_pixelRatio');
         }
       }
-
-      Future.delayed(Duration(milliseconds: 100), _startFrameCapture);
+      _startFrameCapture();
     });
   }
 
@@ -165,11 +166,41 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(title: Text('Camera Boxe')),
-      body: Center(
-        child: RepaintBoundary(
-          key: _videoKey,
-          child: RTCVideoView(_localRenderer),
-        ),
+      body: Column(
+        children: [
+          // Área de vídeo
+          Expanded(
+            child: Center(
+              child: RepaintBoundary(
+                key: _videoKey,
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: RTCVideoView(_localRenderer),
+                ),
+              ),
+            ),
+          ),
+          // Slider para ajustar pixelRatio
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Text('Resolução:'),
+                Expanded(
+                  child: Slider(
+                    min: 0.2,
+                    max: 2.0,
+                    divisions: 18, // passos de 0.1
+                    label: _pixelRatio.toStringAsFixed(1),
+                    value: _pixelRatio,
+                    onChanged: (v) => setState(() => _pixelRatio = v),
+                  ),
+                ),
+                Text('${(_pixelRatio * 100).toInt()}%'),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
