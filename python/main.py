@@ -5,6 +5,7 @@ import base64
 import cv2
 import numpy as np
 from websockets.legacy.server import WebSocketServerProtocol
+import json
 
 from ultralytics import YOLO
 import utils
@@ -28,7 +29,7 @@ def create_context(otimizado):
         lutador2 = Lutador(2, None, 0, 0, None, None)
         frame_lutador = {}
     else:
-        model_path = r"C:\Users\xjoao\PycharmProjects\TCC\python\runs\pose\train16\weights\last.pt"
+        model_path = r"C:\Users\xjoao\PycharmProjects\TCC\python\runs\pose\train13\weights\best.pt"
         model = YOLO(model_path)
         lutador1 = Lutador(1, None, 0, 0, None, None)
         lutador2 = Lutador(2, None, 0, 0, None, None)
@@ -239,7 +240,7 @@ def main_video(otimizado):
     lutador1 = context["lutador1"]
     lutador2 = context["lutador2"]
 
-    video_source = utils.retorna_diretorio("videos/fim1.mp4")
+    video_source = utils.retorna_diretorio("videos/fim2.mp4")
     cap = cv2.VideoCapture(video_source)
 
     tamanho_lista = 10
@@ -295,8 +296,8 @@ def main_video(otimizado):
         "tempo_total_execucao_segundos": round(tempo_total_execucao, 2)
     }
 
-    """with open("estatisticas_video_gpu.txt", "w") as f:
-        json.dump(dados, f, indent=4)"""
+    with open("estatisticas_video_otimizado.txt", "w") as f:
+        json.dump(dados, f, indent=4)
 
 
 # ------------------ Modo Servidor ------------------

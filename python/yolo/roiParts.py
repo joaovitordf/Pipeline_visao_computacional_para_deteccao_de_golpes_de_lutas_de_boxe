@@ -2,10 +2,10 @@ from python.yolo.moduloDefineCoordenadas import nose_coordenadas
 
 # Fatores dinâmicos para definição dos ROIs
 HEAD_ROI_FACTOR = 0.02          # 2% da dimensão para a cabeça
-HAND_ROI_WIDTH_FACTOR = 0.03      # 3% da largura para as mãos
+HAND_ROI_WIDTH_FACTOR = 0.02      # 3% da largura para as mãos
 HAND_ROI_HEIGHT_FACTOR = 0.02     # 2% da altura para as mãos
-WAIST_ROI_WIDTH_FACTOR = 0.03     # 3% da largura para ampliar a região da cintura
-MIN_TRUNK_WIDTH_FACTOR = 0.02     # Largura mínima do tronco em relação à largura da imagem
+WAIST_ROI_WIDTH_FACTOR = 0.01     # 1% da largura para ampliar a região da cintura
+MIN_TRUNK_WIDTH_FACTOR = 0.08     # Largura mínima do tronco em relação à largura da imagem
 
 # Multiplicador para imagens em modo retrato (altura > largura)
 PORTRAIT_WIDTH_MULTIPLIER = 1.2
@@ -78,11 +78,30 @@ def roi_tronco(imagem, keypoints_numpy):
     if (x1, y1) != (0, 0) and (x2, y2) != (0, 0):
         aux_min_x = min(x1, x2)
         aux_max_x = max(x1, x2)
+
+        # fator de largura ajustado
         adjusted_trunk_factor = adjust_width_factor(imagem, MIN_TRUNK_WIDTH_FACTOR)
         min_width = int(imagem.shape[1] * adjusted_trunk_factor)
-        if aux_max_x - aux_min_x < min_width:
-            aux_max_x = aux_min_x + min_width
+
+        current_width = aux_max_x - aux_min_x
+        if current_width < min_width:
+            # centro do tronco
+            center_x = (aux_min_x + aux_max_x) // 2
+            half_width = min_width // 2
+
+            # expande metade para cada lado
+            aux_min_x = center_x - half_width
+            aux_max_x = center_x + half_width
+
+            # clamp nos limites da imagem
+            if aux_min_x < 0:
+                aux_min_x = 0
+                aux_max_x = min_width
+            if aux_max_x > imagem.shape[1]:
+                aux_max_x = imagem.shape[1]
+                aux_min_x = imagem.shape[1] - min_width
+
         start_point = (max(aux_min_x, 0), min(y1, y2))
-        end_point = (min(aux_max_x, imagem.shape[1]), max(y1, y2))
+        end_point   = (min(aux_max_x, imagem.shape[1]), max(y1, y2))
         return (start_point, end_point)
     return None

@@ -61,7 +61,7 @@ class Lutador:
         self.left_ankle = left_ankle  # Tornozelo esquerdo
         self.right_ankle = right_ankle  # Tornozelo direito
 
-    def soco(self):
+    def soco(self, parte: str):
         self.socos += 1
 
     def falta(self):
