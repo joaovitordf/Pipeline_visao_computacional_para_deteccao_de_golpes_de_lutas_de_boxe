@@ -14,10 +14,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Camera Boxe',
-      home: HomePage(),
-    );
+    return MaterialApp(title: 'Câmera Boxe', home: HomePage());
   }
 }
 
@@ -27,10 +24,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController _ipController =
-  TextEditingController(text: '192.168.1.100');
-  final TextEditingController _portController =
-  TextEditingController(text: '8765');
+  final TextEditingController _ipController = TextEditingController(
+    text: '192.168.1.100',
+  );
+  final TextEditingController _portController = TextEditingController(
+    text: '8765',
+  );
 
   bool _connected = false;
 
@@ -77,14 +76,13 @@ class _HomePageState extends State<HomePage> {
   Future<void> _inicializaRestricoes() async {
     final mediaConstraints = {
       'audio': false,
-      'video': {
-        'facingMode': 'environment',
-      },
+      'video': {'facingMode': 'environment'},
     };
 
     try {
-      MediaStream stream =
-      await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      MediaStream stream = await navigator.mediaDevices.getUserMedia(
+        mediaConstraints,
+      );
       setState(() {
         _localStream = stream;
         _localRenderer.srcObject = _localStream;
@@ -116,12 +114,13 @@ class _HomePageState extends State<HomePage> {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       if (_webSocket != null && _videoKey.currentContext != null) {
         RenderRepaintBoundary boundary =
-        _videoKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+            _videoKey.currentContext!.findRenderObject()
+                as RenderRepaintBoundary;
 
-        // Usa o valor dinâmico de pixelRatio
         var image = await boundary.toImage(pixelRatio: _pixelRatio);
-        ByteData? byteData =
-        await image.toByteData(format: ImageByteFormat.png);
+        ByteData? byteData = await image.toByteData(
+          format: ImageByteFormat.png,
+        );
 
         if (byteData != null) {
           Uint8List pngBytes = byteData.buffer.asUint8List();
@@ -190,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                   child: Slider(
                     min: 0.2,
                     max: 2.0,
-                    divisions: 18, // passos de 0.1
+                    divisions: 18,
                     label: _pixelRatio.toStringAsFixed(1),
                     value: _pixelRatio,
                     onChanged: (v) => setState(() => _pixelRatio = v),
