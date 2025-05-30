@@ -1,0 +1,14 @@
+path: "C:/Users/xjoao/PycharmProjects/TCC/python/dataset"
+train: "train/images"
+val:   "val/images"
+
+kpt_shape: [17, 2]
+
+flip_idx: [0,2,1,4,3,6,5,8,7,10,9,12,11,14,13,16,15]
+
+# Nome das classes treinadas
+names:
+  0: vermelho
+  1: azul
+
+

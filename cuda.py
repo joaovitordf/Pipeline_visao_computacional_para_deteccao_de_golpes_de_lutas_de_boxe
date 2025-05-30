@@ -4,6 +4,10 @@ pip uninstall torch torchvision torchaudio -
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 """
 
+"""
+Esse script serve pra saber se tem GPU com suporte cuda no pc
+"""
+
 import torch
 
 print("PyTorch versão:", torch.__version__)

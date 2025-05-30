@@ -21,6 +21,7 @@ SKELETON = [
     (11, 12), (11, 13), (13, 15), (12, 14), (14, 16)
 ]
 
+
 def pernaCoordenadas(imagem, keypoints):
     x1 = int(keypoints[12][0] * imagem.shape[1])
 
@@ -44,8 +45,8 @@ def pernaCoordenadas(imagem, keypoints):
         coordenada_start_y = y1
         coordenada_end_y = y2
 
-    #print(coordenada_start_y, coordenada_end_y)
-    #print(coordenada_start_x, coordenada_end_x)
+    # print(coordenada_start_y, coordenada_end_y)
+    # print(coordenada_start_x, coordenada_end_x)
 
     return [coordenada_start_x, coordenada_end_x, coordenada_start_y, coordenada_end_y]
 
@@ -79,14 +80,14 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
     keypoints = results[0].keypoints
     for pessoa in keypoints:
         keypoints_numpy = pessoa.xyn.cpu().numpy()[0]
-        #draw_boundingBox(imagem, keypoints_numpy)
+        # draw_boundingBox(imagem, keypoints_numpy)
         coord = pernaCoordenadas(frame, keypoints_numpy)
         coordenada_corte.append(coord)
         recorte = frame[coord[2]: coord[3], coord[0]:coord[1]]
         teste = DominantColors(recorte, 1)
         cor = teste.dominantColors()
         if cor.size == 0:
-            #print(f"[boundingBox] recorte vazio em pessoa, pulando define_lutador.")
+            # print(f"[boundingBox] recorte vazio em pessoa, pulando define_lutador.")
             continue
         identifica_lutador = define_lutador(lutador1, lutador2, cor[0])
         if identifica_lutador == 1:
@@ -165,15 +166,15 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
         areaLutador = list()
 
         for box in boxes:
-            #print(keypoints)
+            # print(keypoints)
             coord = coordenada_corte[contador]
-            #print(x)
-            #print(y)
+            # print(x)
+            # print(y)
             recorte = frame[coord[2]: coord[3], coord[0]:coord[1]]
             teste = DominantColors(recorte, 1)
             cor = teste.dominantColors()
             if cor.size == 0:
-                #print(f"[boundingBox] recorte vazio em pessoa, pulando define_lutador.")
+                # print(f"[boundingBox] recorte vazio em pessoa, pulando define_lutador.")
                 continue
             identifica_lutador = define_lutador(lutador1, lutador2, cor[0])
             if identifica_lutador == 1:
@@ -184,9 +185,9 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
                 lutador2.identificador = 2
                 lutador2.box = box
                 frame_lutador[frame_count].update({'lutador_2': lutador2})
-            #frame_lutador[frame_count].update({'lutador_id': identifica_lutador, 'coordenada':})
+            # frame_lutador[frame_count].update({'lutador_id': identifica_lutador, 'coordenada':})
 
-            #print(identifica_lutador)
+            # print(identifica_lutador)
             b = box.xyxy[0]
             box = b.tolist()
             areaLutador.append(box)
@@ -255,7 +256,7 @@ def boundingBoxOtimizado(frame, results, lutador1, lutador2, frame_lutador, fram
         for i, box in enumerate(boxes):
             cls_idx = int(box.cls[0])
             base_label = CLASS_LABELS.get(cls_idx, 'desconhecido')
-            color = CLASS_COLORS.get(cls_idx, (0,255,0))
+            color = CLASS_COLORS.get(cls_idx, (0, 255, 0))
 
             # decide qual lutador e pega contagem de socos
             if cls_idx == 0:
@@ -301,10 +302,10 @@ def boundingBoxOtimizado(frame, results, lutador1, lutador2, frame_lutador, fram
                         cv2.line(annotator.im, pa, pb, color, 2)
 
                 # ROIs
-                head       = roi_cabeca(frame, person_kp)
-                trunk      = roi_tronco(frame, person_kp)
-                waist      = roi_linha_cintura(frame, person_kp)
-                left_hand  = roi_mao_esquerda(frame, person_kp)
+                head = roi_cabeca(frame, person_kp)
+                trunk = roi_tronco(frame, person_kp)
+                waist = roi_linha_cintura(frame, person_kp)
+                left_hand = roi_mao_esquerda(frame, person_kp)
                 right_hand = roi_mao_direita(frame, person_kp)
                 for roi in [head, trunk, waist, left_hand, right_hand]:
                     if roi is not None:
@@ -312,10 +313,10 @@ def boundingBoxOtimizado(frame, results, lutador1, lutador2, frame_lutador, fram
                         cv2.rectangle(annotator.im, start, end, color, 2)
 
                 # atualiza atributos de ROI no objeto lutador
-                lut.roi_cabeca         = head
-                lut.roi_tronco         = trunk
-                lut.roi_linha_cintura  = waist
-                lut.roi_mao_esquerda   = left_hand
-                lut.roi_mao_direita    = right_hand
+                lut.roi_cabeca = head
+                lut.roi_tronco = trunk
+                lut.roi_linha_cintura = waist
+                lut.roi_mao_esquerda = left_hand
+                lut.roi_mao_direita = right_hand
 
     return annotator

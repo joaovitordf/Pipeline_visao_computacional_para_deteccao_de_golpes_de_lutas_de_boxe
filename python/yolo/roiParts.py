@@ -1,19 +1,21 @@
 from python.yolo.moduloDefineCoordenadas import nose_coordenadas
 
 # Fatores dinâmicos para definição dos ROIs
-HEAD_ROI_FACTOR = 0.02          # 2% da dimensão para a cabeça
-HAND_ROI_WIDTH_FACTOR = 0.02      # 3% da largura para as mãos
-HAND_ROI_HEIGHT_FACTOR = 0.02     # 2% da altura para as mãos
-WAIST_ROI_WIDTH_FACTOR = 0.01     # 1% da largura para ampliar a região da cintura
-MIN_TRUNK_WIDTH_FACTOR = 0.08     # Largura mínima do tronco em relação à largura da imagem
+HEAD_ROI_FACTOR = 0.02  # 2% da dimensão para a cabeça
+HAND_ROI_WIDTH_FACTOR = 0.02  # 3% da largura para as mãos
+HAND_ROI_HEIGHT_FACTOR = 0.02  # 2% da altura para as mãos
+WAIST_ROI_WIDTH_FACTOR = 0.01  # 1% da largura para ampliar a região da cintura
+MIN_TRUNK_WIDTH_FACTOR = 0.08  # Largura mínima do tronco em relação à largura da imagem
 
 # Multiplicador para imagens em modo retrato (altura > largura)
 PORTRAIT_WIDTH_MULTIPLIER = 1.2
+
 
 def adjust_width_factor(imagem, factor):
     if imagem.shape[0] > imagem.shape[1]:
         return factor * PORTRAIT_WIDTH_MULTIPLIER
     return factor
+
 
 def roi_cabeca(imagem, keypoints_numpy):
     (x, y) = nose_coordenadas(imagem, keypoints_numpy)
@@ -26,6 +28,7 @@ def roi_cabeca(imagem, keypoints_numpy):
         end_point = (min(x + offset_x, imagem.shape[1]), min(y + offset_y, imagem.shape[0]))
         return (start_point, end_point)
     return None
+
 
 def roi_mao_esquerda(imagem, keypoints_numpy):
     # left-wrist: índice 9
@@ -40,6 +43,7 @@ def roi_mao_esquerda(imagem, keypoints_numpy):
         return (start_point, end_point)
     return None
 
+
 def roi_mao_direita(imagem, keypoints_numpy):
     # right-wrist: índice 10
     x = int(keypoints_numpy[10][0] * imagem.shape[1])
@@ -52,6 +56,7 @@ def roi_mao_direita(imagem, keypoints_numpy):
         end_point = (min(x + offset_x, imagem.shape[1]), min(y + offset_y, imagem.shape[0]))
         return (start_point, end_point)
     return None
+
 
 def roi_linha_cintura(imagem, keypoints_numpy):
     # vai da cintura esquerda ate o pe direito
@@ -68,6 +73,7 @@ def roi_linha_cintura(imagem, keypoints_numpy):
         end_point = (aux_max_x, max(y1, y2))
         return (start_point, end_point)
     return None
+
 
 def roi_tronco(imagem, keypoints_numpy):
     # right-shoulder: índice 6 e left-hip: índice 11
@@ -102,6 +108,6 @@ def roi_tronco(imagem, keypoints_numpy):
                 aux_min_x = imagem.shape[1] - min_width
 
         start_point = (max(aux_min_x, 0), min(y1, y2))
-        end_point   = (min(aux_max_x, imagem.shape[1]), max(y1, y2))
+        end_point = (min(aux_max_x, imagem.shape[1]), max(y1, y2))
         return (start_point, end_point)
     return None

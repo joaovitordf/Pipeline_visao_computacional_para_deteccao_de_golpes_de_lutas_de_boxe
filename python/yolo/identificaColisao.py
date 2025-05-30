@@ -2,11 +2,10 @@ import cv2
 from ultralytics import YOLO
 import numpy as np
 
-
 from python.yolo.moduloMeioLutador import moduloMeioLutadores, moduloMeioLutadoresOtimizado, calcular_distancia
 
-def colisao(roi1, roi2, distancia_max_ponto=20.0):
 
+def colisao(roi1, roi2, distancia_max_ponto=20.0):
     if roi1 is None or roi2 is None:
         return False
 
@@ -19,7 +18,7 @@ def colisao(roi1, roi2, distancia_max_ponto=20.0):
 
     # caso 2: bbox como dois pontos (top-left, bottom-right)
     if (hasattr(roi1, '__len__') and len(roi1) == 2
-        and hasattr(roi1[0], '__len__') and len(roi1[0]) == 2):
+            and hasattr(roi1[0], '__len__') and len(roi1[0]) == 2):
         x11, y11 = roi1[0]
         x12, y12 = roi1[1]
         x21, y21 = roi2[0]
@@ -45,7 +44,7 @@ def verificaGolpeIrregular(roi_golpe, roi_linha_cintura):
 
     # Verifica se há interseção entre os dois retângulos
     horizontal_overlap = not (x2 < x_left or x1 > x_right)
-    vertical_overlap   = not (y2 < y_top  or y1 > y_bottom)
+    vertical_overlap = not (y2 < y_top or y1 > y_bottom)
 
     return horizontal_overlap and vertical_overlap
 
@@ -55,9 +54,8 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
 
     h, w = frame.shape[:2]
     limiar = w * 0.1  # 10% da largura da tela
-    #print(limiar)
+    # print(limiar)
     if lutador1.distancia is not None and lutador1.distancia > limiar:
-
         # ----------------------------- Possivel ataque do lutador 1 -----------------------------
         # dentro do trecho de ataque do lutador1:
         processa_colisao_mao(
@@ -86,7 +84,6 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
         )
 
         # ----------------------------------------------------------------------------------------
-
 
         # ----------------------------- Possível golpe irregular -----------------------------
 
@@ -120,6 +117,7 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
         frame_lutador[frame_count].update({'lutador_2': lutador2})
 
     return frame
+
 
 def processa_colisao_mao(atacante, defensor, roi_mao_attr):
     roi_mao = getattr(atacante, roi_mao_attr, None)
@@ -206,13 +204,13 @@ def automatoColisaoOtimizado(frame, results, lutador1, lutador2, frame_lutador, 
 
     ataques = [
         (lutador1, 'roi_mao_esquerda', lutador2, 'roi_cabeca', 'esquerda_cabeca', 'cabeca'),
-        (lutador1, 'roi_mao_direita',  lutador2, 'roi_cabeca', 'direita_cabeca',  'cabeca'),
-        (lutador1, 'roi_mao_esquerda', lutador2, 'roi_tronco','esquerda_tronco','tronco'),
-        (lutador1, 'roi_mao_direita',  lutador2, 'roi_tronco','direita_tronco', 'tronco'),
+        (lutador1, 'roi_mao_direita', lutador2, 'roi_cabeca', 'direita_cabeca', 'cabeca'),
+        (lutador1, 'roi_mao_esquerda', lutador2, 'roi_tronco', 'esquerda_tronco', 'tronco'),
+        (lutador1, 'roi_mao_direita', lutador2, 'roi_tronco', 'direita_tronco', 'tronco'),
         (lutador2, 'roi_mao_esquerda', lutador1, 'roi_cabeca', 'esquerda_cabeca', 'cabeca'),
-        (lutador2, 'roi_mao_direita',  lutador1, 'roi_cabeca', 'direita_cabeca',  'cabeca'),
-        (lutador2, 'roi_mao_esquerda', lutador1, 'roi_tronco','esquerda_tronco','tronco'),
-        (lutador2, 'roi_mao_direita',  lutador1, 'roi_tronco','direita_tronco', 'tronco'),
+        (lutador2, 'roi_mao_direita', lutador1, 'roi_cabeca', 'direita_cabeca', 'cabeca'),
+        (lutador2, 'roi_mao_esquerda', lutador1, 'roi_tronco', 'esquerda_tronco', 'tronco'),
+        (lutador2, 'roi_mao_direita', lutador1, 'roi_tronco', 'direita_tronco', 'tronco'),
     ]
 
     for atacante, mao_attr, defensor, parte_attr, flag_suf, parte in ataques:
@@ -235,10 +233,10 @@ def automatoColisaoOtimizado(frame, results, lutador1, lutador2, frame_lutador, 
 
     # ----------------------------- Golpe irregular abaixo da cintura -----------------------------
     checa_golpe_irregular(lutador1, lutador2, 'roi_mao_esquerda', 'roi_linha_cintura')
-    checa_golpe_irregular(lutador1, lutador2, 'roi_mao_direita',  'roi_linha_cintura')
+    checa_golpe_irregular(lutador1, lutador2, 'roi_mao_direita', 'roi_linha_cintura')
 
     checa_golpe_irregular(lutador2, lutador1, 'roi_mao_esquerda', 'roi_linha_cintura')
-    checa_golpe_irregular(lutador2, lutador1, 'roi_mao_direita',  'roi_linha_cintura')
+    checa_golpe_irregular(lutador2, lutador1, 'roi_mao_direita', 'roi_linha_cintura')
     # ---------------------------------------------------------------------------------------------
 
     # atualiza histórico de quadros

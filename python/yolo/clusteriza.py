@@ -2,6 +2,7 @@ import cv2
 from sklearn.cluster import KMeans
 import numpy as np
 
+
 class DominantColors:
     def __init__(self, image, clusters=3):
         self.CLUSTERS = clusters
