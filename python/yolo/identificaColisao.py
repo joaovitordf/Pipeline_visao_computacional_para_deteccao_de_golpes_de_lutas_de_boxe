@@ -53,7 +53,8 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
     frame = moduloMeioLutadores(frame, results, cores, lutador1, lutador2, frame_lutador, frame_count)
 
     h, w = frame.shape[:2]
-    limiar = w * 0.1  # 10% da largura da tela
+    # Distancia aceita para contar os golpes (baseado na resolucao da tela)
+    limiar = w * 0.12  # 12% da largura da tela
     # print(limiar)
     if lutador1.distancia is not None and lutador1.distancia > limiar:
         # ----------------------------- Possivel ataque do lutador 1 -----------------------------

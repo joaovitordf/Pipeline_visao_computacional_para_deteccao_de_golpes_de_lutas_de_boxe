@@ -2,7 +2,7 @@ from python.yolo.moduloDefineCoordenadas import nose_coordenadas
 
 # Fatores dinâmicos para definição dos ROIs
 HEAD_ROI_FACTOR = 0.02  # 2% da dimensão para a cabeça
-HAND_ROI_WIDTH_FACTOR = 0.02  # 3% da largura para as mãos
+HAND_ROI_WIDTH_FACTOR = 0.03  # 3% da largura para as mãos
 HAND_ROI_HEIGHT_FACTOR = 0.02  # 2% da altura para as mãos
 WAIST_ROI_WIDTH_FACTOR = 0.01  # 1% da largura para ampliar a região da cintura
 MIN_TRUNK_WIDTH_FACTOR = 0.08  # Largura mínima do tronco em relação à largura da imagem

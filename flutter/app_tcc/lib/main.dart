@@ -14,7 +14,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Câmera Boxe', home: HomePage());
+    return MaterialApp(title: 'Camera Boxe', home: HomePage());
   }
 }
 
@@ -114,8 +114,8 @@ class _HomePageState extends State<HomePage> {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       if (_webSocket != null && _videoKey.currentContext != null) {
         RenderRepaintBoundary boundary =
-            _videoKey.currentContext!.findRenderObject()
-                as RenderRepaintBoundary;
+        _videoKey.currentContext!.findRenderObject()
+        as RenderRepaintBoundary;
 
         var image = await boundary.toImage(pixelRatio: _pixelRatio);
         ByteData? byteData = await image.toByteData(

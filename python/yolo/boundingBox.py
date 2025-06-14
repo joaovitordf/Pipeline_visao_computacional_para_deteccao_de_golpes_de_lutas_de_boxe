@@ -204,7 +204,7 @@ def boundingBox(frame, results, cores, lutador1, lutador2, frame_lutador, frame_
                 )
             else:
                 label_lutador = "Lutador desconhecido"
-            annotator.box_label(b, label_lutador, color=(0, 255, 0))
+            annotator.box_label(b, label_lutador, color=(0, 0, 0))
 
             if lutador1.roi_cabeca is not None:
                 start, end = lutador1.roi_cabeca
