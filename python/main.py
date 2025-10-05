@@ -19,6 +19,10 @@ from collections import deque
 
 global_context = None
 
+# PESO DO PROTOTIPO TREINADO
+# NECESARIO FAZER DOWNLOAD PARA UTILIZAR ELE:
+# https://drive.google.com/file/d/1RembrI4XU1fhLj_Y0GpEDt-d7ZXs78Hp/view?usp=sharing
+
 
 def create_context(otimizado):
     if otimizado == 0:
