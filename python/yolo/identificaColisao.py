@@ -54,7 +54,7 @@ def automatoColisao(frame, results, cores, lutador1, lutador2, frame_lutador, fr
 
     h, w = frame.shape[:2]
     # Distancia aceita para contar os golpes (baseado na resolucao da tela)
-    limiar = w * 0.12  # 12% da largura da tela
+    limiar = w * 0.14  # 14% da largura da tela
     # print(limiar)
     if lutador1.distancia is not None and lutador1.distancia > limiar:
         # ----------------------------- Possivel ataque do lutador 1 -----------------------------

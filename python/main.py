@@ -122,7 +122,7 @@ def main_video(otimizado):
     lutador1 = context["lutador1"]
     lutador2 = context["lutador2"]
 
-    video_source = utils.retorna_diretorio("videos/fim1.mp4")
+    video_source = utils.retorna_diretorio("videos/fim3.mp4")
     cap = cv2.VideoCapture(video_source)
 
     tamanho_lista = 10

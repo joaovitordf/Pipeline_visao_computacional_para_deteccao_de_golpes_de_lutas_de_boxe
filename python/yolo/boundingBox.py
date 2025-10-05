@@ -51,7 +51,7 @@ def pernaCoordenadas(imagem, keypoints):
     return [coordenada_start_x, coordenada_end_x, coordenada_start_y, coordenada_end_y]
 
 
-def define_lutador(lutador1, lutador2, cor, tolerancia=100):
+def define_lutador(lutador1, lutador2, cor, tolerancia=80):
     cor = np.array(cor, dtype=float)
     c1 = np.array(lutador1.cor, dtype=float)
     c2 = np.array(lutador2.cor, dtype=float)
